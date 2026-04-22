@@ -52,6 +52,6 @@ def _render_stance_chart(reactions: dict[str, dict[str, Any]]) -> None:
             )
             .properties(height=200)
         )
-        st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, width="stretch")
     except ImportError:
         st.bar_chart({"Stance": {labels.get(k, k): v.get("support_or_oppose", 0) for k, v in reactions.items()}})

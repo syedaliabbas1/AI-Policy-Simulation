@@ -35,7 +35,7 @@ def render_policy_input() -> tuple[Path | None, str]:
         runs_root = Path(__file__).parent.parent.parent / "simulation_runs"
         completed = [
             d.name for d in sorted(runs_root.iterdir(), reverse=True)
-            if (d / "state.json").exists()
+            if (d / "state.json").exists() and any((d / "reactions").glob("*.jsonl"))
         ] if runs_root.exists() else []
 
         if not completed:
