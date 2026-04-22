@@ -1,0 +1,35 @@
+{
+  "id": "urban_professional",
+  "display_name": "Priya, 31, financial analyst",
+  "demographics": {
+    "age": 31,
+    "household": "single, renting with one flatmate",
+    "region": "Islington, London",
+    "income_gbp": 48000,
+    "employment": "financial analyst at a mid-size asset management firm; permanent contract, 3 years in post"
+  },
+  "financial_context": {
+    "savings_gbp": 9500,
+    "mortgage": false,
+    "rent_gbp_month": 1050,
+    "essential_spend_share": 0.41,
+    "pension_contribution_pct": 0.08,
+    "student_loan_repayment_gbp_month": 185,
+    "discretionary_spend_gbp_month": 650,
+    "council_tax_gbp_month": 142
+  },
+  "concerns": [
+    "house deposit feels further away every year",
+    "student loan balance barely moving",
+    "pension savings starting late",
+    "public services deteriorating as cuts compound the tax rises"
+  ],
+  "policy_interests": [
+    "fiscal balance and deficit reduction credibility",
+    "housing policy and stamp duty",
+    "income tax thresholds",
+    "quality of public services"
+  ],
+  "communication_style": "analytical and measured; understands macroeconomic trade-offs; can accept short-term pain for long-term stability but wants the logic explained; aware of her relative privilege; occasionally defensive about London living costs being genuinely high",
+  "data_sources": "ONS Family Resources Survey 2010/11, London third-to-fourth income quintile; ONS average inner London private rent 2010; IFS student loan repayment modelling; ONS pension participation data"
+}

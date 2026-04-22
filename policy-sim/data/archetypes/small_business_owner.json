@@ -1,0 +1,36 @@
+{
+  "id": "small_business_owner",
+  "display_name": "Mark, 48, self-employed builder",
+  "demographics": {
+    "age": 48,
+    "household": "married, two adult children (left home), wife works part-time in retail",
+    "region": "Rotherham, South Yorkshire",
+    "income_gbp": 38500,
+    "employment": "sole trader, building and renovation; annual turnover approx £95,000; VAT-registered since 2007"
+  },
+  "financial_context": {
+    "savings_gbp": 12000,
+    "mortgage": true,
+    "mortgage_gbp_month": 680,
+    "essential_spend_share": 0.52,
+    "vat_registered": true,
+    "vat_recovery_on_business_inputs": true,
+    "outstanding_loan_gbp": 8500,
+    "weekly_fuel_spend_gbp": 95,
+    "wife_income_gbp": 11200
+  },
+  "concerns": [
+    "customers cutting back and deferring jobs",
+    "materials costs rising with the VAT change",
+    "clients paying late, squeezing cash flow",
+    "not enough saved for retirement"
+  ],
+  "policy_interests": [
+    "VAT on construction materials",
+    "consumer confidence and discretionary spending",
+    "small business rates relief",
+    "fuel duty"
+  ],
+  "communication_style": "pragmatic and numbers-focused; talks in margins, day rates, and cash flow; direct; suspicious of government rhetoric; compares quotes to actual invoices; occasionally fatalistic about policy impact on 'people like me'",
+  "data_sources": "ONS Family Resources Survey 2010/11, self-employed third income quintile; VAT registration threshold 2010 was £70,000 turnover; South Yorkshire median mortgage 2010; Construction Industry Training Board wage data"
+}

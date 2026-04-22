@@ -1,0 +1,36 @@
+{
+  "id": "low_income_worker",
+  "display_name": "Sarah, 34, part-time care worker",
+  "demographics": {
+    "age": 34,
+    "household": "single parent, 2 children (ages 6 and 9)",
+    "region": "Sunderland, North East England",
+    "income_gbp": 18200,
+    "employment": "part-time domiciliary care work, 24 hrs/week at £7.20/hr; occasional agency shifts"
+  },
+  "financial_context": {
+    "savings_gbp": 180,
+    "mortgage": false,
+    "rent_gbp_month": 620,
+    "essential_spend_share": 0.78,
+    "weekly_grocery_spend_gbp": 85,
+    "weekly_transport_spend_gbp": 22,
+    "weekly_energy_spend_gbp": 28,
+    "council_tax_gbp_month": 112,
+    "receives_benefits": ["child tax credit", "housing benefit (partial)", "child benefit"]
+  },
+  "concerns": [
+    "fuel bills rising faster than wages",
+    "school costs and uniform replacements",
+    "food prices at the checkout",
+    "childcare gaps on agency shift days"
+  ],
+  "policy_interests": [
+    "VAT on everyday goods",
+    "benefits uprating versus inflation",
+    "child tax credit levels",
+    "energy prices"
+  ],
+  "communication_style": "plain, direct, occasionally frustrated; grounds everything in concrete daily examples — the weekly shop, the school run, the energy meter; short sentences; no economic jargon",
+  "data_sources": "ONS Family Resources Survey 2010/11, bottom income quintile, single-parent household; North East England median private rent 2010; National Minimum Wage April 2010 £5.93/hr (care sector often paid minimum)"
+}

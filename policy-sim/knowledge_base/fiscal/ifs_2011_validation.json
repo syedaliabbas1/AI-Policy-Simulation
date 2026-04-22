@@ -1,0 +1,98 @@
+{
+  "source": "IFS distributional analysis of 2010 UK Coalition fiscal consolidation",
+  "citation": "Browne, J. and Levell, P. (2011). 'The distributional effect of tax and benefit reforms to be introduced between June 2010 and April 2014: a revised assessment'. IFS Briefing Note BN116. Institute for Fiscal Studies, London.",
+  "scenario": "UK VAT rise from 17.5% to 20%, announced June 2010 Emergency Budget, implemented 4 January 2011",
+  "key_finding": "The VAT rise is broadly proportional as a share of household expenditure but regressive as a share of net household income. The mechanism: lower-income households save a smaller fraction of income, so a higher proportion of their income is subject to consumption taxes.",
+  "note_on_figures": "Income loss percentages are approximate figures consistent with IFS BN116 distributional analysis. Used for directional (pattern-oriented) validation — the simulation validates that archetype reactions are directionally consistent with these findings, not that they reproduce exact values.",
+  "distributional_findings": {
+    "by_income_quintile": {
+      "bottom_quintile": {
+        "income_loss_pct_of_net_income": 1.8,
+        "direction": "hardest hit proportionally",
+        "mechanism": "high consumption-to-income ratio; limited savings; high share on standard-rated goods"
+      },
+      "second_quintile": {
+        "income_loss_pct_of_net_income": 1.4,
+        "direction": "hard hit"
+      },
+      "third_quintile": {
+        "income_loss_pct_of_net_income": 1.1,
+        "direction": "moderate impact"
+      },
+      "fourth_quintile": {
+        "income_loss_pct_of_net_income": 0.9,
+        "direction": "below-average proportional impact"
+      },
+      "top_quintile": {
+        "income_loss_pct_of_net_income": 0.6,
+        "direction": "least affected proportionally",
+        "mechanism": "higher savings rate means smaller fraction of income faces consumption tax"
+      }
+    }
+  },
+  "archetype_validation_expectations": {
+    "low_income_worker": {
+      "income_quintile": "bottom",
+      "expected_support_or_oppose_sign": -1,
+      "expected_concern_themes": [
+        "weekly grocery and essential goods costs",
+        "gap between benefit uprating and price rises",
+        "transport and childcare costs"
+      ],
+      "validation_rule": "support_or_oppose must be negative (threshold: < -0.3)",
+      "plausibility_check": "At £18,200 income with 0.78 essential_spend_share, annual VAT exposure on standard-rated portion approx £200-350. Stated immediate_impact should be in this range or reference proportional squeeze rather than absolute cash."
+    },
+    "small_business_owner": {
+      "income_quintile": "third",
+      "expected_support_or_oppose_sign": -1,
+      "expected_concern_themes": [
+        "consumer demand suppression reducing work pipeline",
+        "materials cost pass-through on VAT-able inputs",
+        "cash flow pressure from delayed client payments"
+      ],
+      "validation_rule": "support_or_oppose must be negative; may be less strongly negative than low_income_worker due to VAT recovery on business inputs",
+      "plausibility_check": "VAT-registered: input VAT recovered on materials. Personal consumption impact on £38,500 income at 0.52 essential_spend_share approx £300-450/yr. Business concern is demand-side."
+    },
+    "urban_professional": {
+      "income_quintile": "third_to_fourth",
+      "expected_support_or_oppose_sign": -1,
+      "expected_concern_themes": [
+        "discretionary spending reduction",
+        "housing cost compound pressure",
+        "acceptance of fiscal trade-off with residual concern"
+      ],
+      "validation_rule": "support_or_oppose should be negative but less strongly so than low_income_worker or retired_pensioner; may be -0.1 to -0.4 reflecting analytical acceptance",
+      "plausibility_check": "At £48,000 income with 0.41 essential_spend_share, VAT exposure approx £350-500/yr. Higher absolute cost but lower proportional income impact."
+    },
+    "retired_pensioner": {
+      "income_quintile": "bottom_to_second",
+      "expected_support_or_oppose_sign": -1,
+      "expected_concern_themes": [
+        "fixed income eroded by rising prices",
+        "heating costs (reduced-rate but still rising)",
+        "inability to increase income in response"
+      ],
+      "validation_rule": "support_or_oppose must be negative (threshold: < -0.4); heating and essential cost themes especially salient given 0.83 essential_spend_share",
+      "plausibility_check": "At £11,400 income with 0.83 essential_spend_share, VAT exposure on standard-rated portion approx £150-250/yr. High proportional burden relative to income. Frozen occupational pension means no uprating offset."
+    }
+  },
+  "ordering_expectation": {
+    "description": "Low income worker and retired pensioner should express stronger opposition (more negative support_or_oppose) than urban professional. Small business owner's opposition is business-driven as much as personal.",
+    "expected_ranking_most_to_least_opposed": [
+      "low_income_worker",
+      "retired_pensioner",
+      "small_business_owner",
+      "urban_professional"
+    ]
+  },
+  "internal_consistency_checks": {
+    "sign_flip_on_vat_cut": "If scenario changes to VAT cut (20% to 17.5%), support_or_oppose signs should flip positive for all archetypes. Used in Stage 4 counter-scenario verification.",
+    "concern_rationale_overlap": "At least 2 of each archetype's stated concerns should appear as themes in their rationale field.",
+    "no_hallucinated_policy": "Archetypes must not reference policy elements not present in the scenario document (e.g. income tax changes, benefit cuts, pension changes unless stated in the policy input).",
+    "communication_style_match": "Archetype rationale language should match the persona's stated communication_style."
+  },
+  "counter_scenario_reference": {
+    "file": "knowledge_base/fiscal/uk_vat_cut_hypothetical.md",
+    "description": "Hypothetical VAT cut from 20% to 17.5%, used only for Stage 4 sign-flip verification. Not the primary scenario."
+  }
+}

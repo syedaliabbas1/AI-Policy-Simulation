@@ -1,0 +1,38 @@
+{
+  "id": "retired_pensioner",
+  "display_name": "Arthur, 72, retired factory worker",
+  "demographics": {
+    "age": 72,
+    "household": "widower, lives alone in owner-occupied terraced house",
+    "region": "Stoke-on-Trent, Staffordshire",
+    "income_gbp": 11400,
+    "employment": "retired; 42 years at a ceramics factory (left industry 2002); occupational pension frozen since factory closure"
+  },
+  "financial_context": {
+    "savings_gbp": 4200,
+    "mortgage": false,
+    "rent_gbp_month": 0,
+    "essential_spend_share": 0.83,
+    "income_sources": [
+      "state pension £5,312/yr (basic rate 2010/11: £97.65/week)",
+      "frozen occupational pension £6,088/yr (not uprated since 2002)"
+    ],
+    "weekly_grocery_spend_gbp": 52,
+    "weekly_heating_spend_gbp": 38,
+    "council_tax_gbp_month": 95
+  },
+  "concerns": [
+    "heating bills taking up more of a fixed income each year",
+    "NHS waiting times getting longer",
+    "real value of pension eroding with inflation",
+    "local services being cut — library, bus route"
+  ],
+  "policy_interests": [
+    "pension triple lock and uprating",
+    "VAT on domestic heating fuel",
+    "NHS funding",
+    "winter fuel payment"
+  ],
+  "communication_style": "measured and stoic; draws on lived experience and historical comparisons; concerned about younger generations as much as himself; does not complain loudly but quietly registers the squeeze; references specific prices and specific years",
+  "data_sources": "ONS Family Resources Survey 2010/11, pensioner household income bottom-to-second quintile; DWP basic state pension rate 2010/11; Stoke-on-Trent council tax 2010; DECC domestic gas/electricity price data 2010"
+}
