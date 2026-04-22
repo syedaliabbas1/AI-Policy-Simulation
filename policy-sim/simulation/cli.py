@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .engine import RunCallbacks, SimulationEngine
 from .replay import replay_run
-from .validation import validate_run
+from .validation import compare_runs, validate_run
 
 
 # ------------------------------------------------------------------
@@ -34,7 +34,9 @@ def register_commands(sub: argparse._SubParsersAction) -> None:
     replay_p.add_argument("--delay-ms", type=int, default=25, help="Token pacing delay in ms")
 
     validate_p = sub.add_parser("validate", help="Run IFS directional validation on a completed run")
-    validate_p.add_argument("--run-id", required=True)
+    validate_p.add_argument("--run-id", default=None)
+    validate_p.add_argument("--compare-runs", nargs=2, metavar=("RUN_A", "RUN_B"),
+                            help="Compare support_or_oppose sign-flip between two run IDs")
     validate_p.add_argument("--runs-root", default="simulation_runs")
 
     status_p = sub.add_parser("status", help="Show run status")
@@ -113,6 +115,19 @@ def handle(args: argparse.Namespace) -> int:
 
     if command == "validate":
         engine = SimulationEngine(runs_root=args.runs_root)
+        if args.compare_runs:
+            run_a_id, run_b_id = args.compare_runs
+            result = compare_runs(
+                run_dir_a=engine._paths(run_a_id).run_dir,
+                run_dir_b=engine._paths(run_b_id).run_dir,
+            )
+            print(json.dumps(result, indent=2))
+            overall = "PASS" if result.get("overall_pass") else "FAIL"
+            print(f"\nSign-flip comparison: {overall}", file=sys.stderr)
+            return 0 if result.get("overall_pass") else 1
+        if not args.run_id:
+            print("error: --run-id is required when --compare-runs is not set", file=sys.stderr)
+            return 2
         result = validate_run(
             run_dir=engine._paths(args.run_id).run_dir,
             ifs_data_path=Path(__file__).parent.parent / "knowledge_base" / "fiscal" / "ifs_2011_validation.json",

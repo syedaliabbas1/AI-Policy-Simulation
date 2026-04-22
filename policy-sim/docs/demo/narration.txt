@@ -1,0 +1,25 @@
+When governments design fiscal policy, they model aggregate effects — tax revenue, GDP impact, headline distributional quintiles. What they rarely model is how a specific person, in a specific town, with a specific income and set of anxieties, actually experiences it.
+
+This platform does that. It takes a policy document, and it asks four real UK population archetypes — grounded in ONS household data and IFS distributional findings — to reason through it in their own voice.
+
+The scenario is the 2010 VAT rise — the Coalition's lead revenue measure. We've loaded the full policy document, background context, and IFS validation anchors. We're running live against the API.
+
+First, a supervisor agent reads the policy and writes a personalised briefing for each archetype — concretely: this person earns eighteen thousand two hundred pounds, spends 78% of income on essentials. What does a two-and-a-half-point VAT rise mean to them, in pounds, this week? Extended thinking is on. The model has space to actually do the arithmetic before it writes.
+
+Four archetypes run in parallel. Sarah — 34, single parent, care worker in Sunderland. Margaret — 71, retired pensioner in Stoke. David — 48, builder in South Yorkshire. James — 29, urban professional in London. Each reasons in first person, from their own financial situation.
+
+Sarah says: "three hundred and something quid a year I haven't got." Not a policy estimate — a person's specific budget arithmetic, in their own words.
+
+James, on forty-eight thousand, concedes the personal impact is manageable — but objects on structural grounds: the regressivity on an income basis, and the eighty-twenty spending-cuts-to-tax mix.
+
+The reporter aggregates all four reactions into a structured brief: distributional impact, key concerns by group, five concrete recommendations — and a simulation boundary statement, so decision-makers know exactly what kind of evidence this is.
+
+These aren't generic policy suggestions. They're anchored to what the archetypes actually said — extend zero-rating to school-age footwear, publish a transparent benefits uprating schedule, provide cash-flow support for small trades businesses.
+
+The stance chart shows support-oppose scores for each archetype. Everyone opposes the VAT rise — but the shape matters: low income at minus 0.7, urban professional at minus 0.1.
+
+Validation runs automatically against IFS published findings. All four checks pass: directional sign correct, income ordering matches IFS quintile data, IFS concerns appear in the rationale, no hallucinated policy content.
+
+Every run is persisted as token-level JSON lines. Replay mode re-streams without an API call — useful for demos, evaluation, and prompt iteration without burning compute.
+
+The platform is built on Claude Opus 4.7 with extended thinking. The thinking quality is the feature — it's what turns a policy document into a person's specific lived arithmetic.

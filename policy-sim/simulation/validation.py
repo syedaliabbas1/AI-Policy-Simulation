@@ -104,6 +104,57 @@ def validate_run(
     return report
 
 
+def compare_runs(run_dir_a: Path, run_dir_b: Path) -> dict[str, Any]:
+    """Check that shared archetypes have opposite support_or_oppose signs between two runs.
+
+    Intended for counter-scenario sign-flip validation (e.g. VAT rise vs VAT cut).
+    Saves comparison.json to run_dir_a.
+    """
+
+    def _load_reactions(run_dir: Path) -> dict[str, float]:
+        reactions_dir = run_dir / "reactions"
+        result: dict[str, float] = {}
+        if reactions_dir.exists():
+            for p in sorted(reactions_dir.glob("*.jsonl")):
+                events = read_jsonl(p)
+                complete = next(
+                    (e["data"] for e in reversed(events) if e.get("event") == "complete"),
+                    None,
+                )
+                if complete is not None:
+                    score = complete.get("support_or_oppose")
+                    if score is not None:
+                        result[p.stem] = float(score)
+        return result
+
+    scores_a = _load_reactions(run_dir_a)
+    scores_b = _load_reactions(run_dir_b)
+
+    shared = sorted(set(scores_a) & set(scores_b))
+    details: dict[str, Any] = {}
+    for archetype_id in shared:
+        a = scores_a[archetype_id]
+        b = scores_b[archetype_id]
+        flipped = (a * b) < 0
+        details[archetype_id] = {
+            "run_a": a,
+            "run_b": b,
+            "sign_flipped": flipped,
+        }
+
+    overall_pass = bool(shared) and all(v["sign_flipped"] for v in details.values())
+
+    report = {
+        "run_a": run_dir_a.name,
+        "run_b": run_dir_b.name,
+        "compared_at": utc_now_iso(),
+        "overall_pass": overall_pass,
+        "details": details,
+    }
+    write_json(run_dir_a / "comparison.json", report)
+    return report
+
+
 def _parse_threshold(rule: str) -> float | None:
     """Extract a numeric threshold from a validation rule string like '< -0.3'."""
     import re
