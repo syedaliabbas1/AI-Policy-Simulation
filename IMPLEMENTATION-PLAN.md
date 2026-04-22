@@ -409,7 +409,8 @@ Recorded against `--replay` — deterministic, no API dependency during filming.
 - **4 archetypes** — JSON personas + one shared `archetype-agent/SKILL.md` + distinct runtime streaming sessions (Option C hybrid)
 - **SKILL.md body = prompt source of truth**, loaded by Python at runtime (Approach I)
 - **Dual runtime** — Streamlit primary, `.claude/agents/` secondary
-- **Extended thinking** enabled on archetype calls
+- **Extended thinking** enabled on archetype calls — Opus 4.7 uses `thinking={"type":"adaptive"}` + `output_config={"effort":"high"}` (not the `enabled`/`budget_tokens` API used by earlier models)
+- **tool_choice must be `"auto"`** with adaptive thinking — forced tool_choice (`"type":"tool"`) is rejected by the API when thinking is enabled; the archetype system prompt's "You MUST use the Reaction tool" is sufficient
 - **Tool-use structured output** for reactions
 - **Prompt caching** on personas + knowledge_base
 - **JSONL artifact persistence + replay mode**
