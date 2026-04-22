@@ -1,0 +1,35 @@
+# Python-generated files
+__pycache__/
+**/__pycache__/
+*.py[oc]
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+.DS_Store
+
+build/
+dist/
+wheels/
+*.egg-info
+.vscode
+
+# Virtual environments
+.venv
+runs/
+bo_runs/
+research_runs/
+evaluation_backends/
+results/
+data/*_drfp/
+data/*_drfp*/
+data/*egfr_*/
+data/egfr_global_features*
+data/bh_*
+
+papers
+report/
+BO-Tutorial-for-Sci
+bo-proposal.docx
+
+.ruff_cache/
+.claude/settings.local.json
