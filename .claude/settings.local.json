@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx *)",
+      "Bash(MSYS_NO_PATHCONV=1 npx *)",
+      "Bash(edge-tts --list-voices)"
+    ]
+  }
+}

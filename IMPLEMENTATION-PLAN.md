@@ -12,17 +12,18 @@
 This plan is designed to survive across sessions and agents (Sonnet, MiniMax, Opus). If you are a new agent picking this up:
 
 1. **Read this entire file first.** It is the single source of truth. Do not re-plan.
-2. **Recreate the task list in your session.** Prior task lists do NOT transfer. Use TaskCreate to rebuild tasks from the "Build Sequence" section below. Mark them in_progress / completed as you go.
-3. **Check current progress** by listing `D:\work\ai-govt-policy\policy-sim\` — what exists is done, what is missing is not. Cross-reference against the "File Layout" section.
-4. **Follow the user's global CLAUDE.md** at `C:\Users\Ossaid\.claude\CLAUDE.md`:
+2. **Then read `policy-sim/MEDIA-PLAN.md`** — the wow-factor media layer (voices, portraits, focus-group UI, deferred lip-sync). Added 2026-04-23. Written for Sonnet execution with Opus 4.7 as advisor.
+3. **Recreate the task list in your session.** Prior task lists do NOT transfer. Use TaskCreate to rebuild tasks from the "Build Sequence" section below. Mark them in_progress / completed as you go.
+4. **Check current progress** by listing `D:\work\ai-govt-policy\policy-sim\` — what exists is done, what is missing is not. Cross-reference against the "File Layout" section.
+5. **Follow the user's global CLAUDE.md** at `C:\Users\Ossaid\.claude\CLAUDE.md`:
    - No emojis anywhere in code or docs
    - No "Generated with Claude" attribution on commits
    - Opinionated recommendations with tradeoffs, ask before assuming direction
    - Review thoroughly before making changes
-5. **Reuse from `agentic-bo/`** wherever the "Reuse" table below calls it out. Do not reimplement what already exists.
-6. **Do not drift from scope.** Tier C is locked. Anything listed as "out of scope" stays out — no Next.js, no LangGraph, no paid services.
-7. **Default to Opus 4.7** for code the user runs; Sonnet is fine for writing plans, docs, and summaries; Haiku for trivial transformations.
-8. **Ask the user before any destructive action** (deleting files, force pushes, rebases, overwriting uncommitted work).
+6. **Reuse from `agentic-bo/`** wherever the "Reuse" table below calls it out. Do not reimplement what already exists.
+7. **Do not drift from scope.** Tier C is locked. Anything listed as "out of scope" stays out — no Next.js, no LangGraph, no paid services.
+8. **Default to Opus 4.7** for code the user runs; Sonnet is fine for writing plans, docs, and summaries; Haiku for trivial transformations. When a Sonnet session is executing on the media layer, call `advisor()` at the checkpoints listed in `policy-sim/MEDIA-PLAN.md` — the advisor runs Opus 4.7 with full conversation context.
+9. **Ask the user before any destructive action** (deleting files, force pushes, rebases, overwriting uncommitted work).
 
 If any section of this plan conflicts with user instructions issued live in the session, the live instructions win — update this plan file to reflect the change.
 
