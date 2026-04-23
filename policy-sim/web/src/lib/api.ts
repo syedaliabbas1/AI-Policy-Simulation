@@ -25,8 +25,40 @@ export interface Scenario {
   label: string
 }
 
+export interface Policy {
+  id: string
+  label: string
+  scenario_path: string
+  description: string
+  archetype_ids: string[]
+}
+
+export interface CompareRun {
+  run_id: string
+  policy_label: string
+  archetype_scores: Record<string, { score: number; name: string }>
+}
+
+export interface CompareBrief {
+  run_id: string
+  policy_label: string
+  markdown: string
+}
+
 export async function listScenarios(): Promise<Scenario[]> {
   return apiFetch<Scenario[]>("/api/scenarios")
+}
+
+export async function listPolicies(): Promise<Policy[]> {
+  return apiFetch<Policy[]>("/api/policies")
+}
+
+export async function compareRuns(runIds: string[]): Promise<{ runs: CompareRun[] }> {
+  return apiFetch<{ runs: CompareRun[] }>(`/api/runs/compare?runs=${runIds.join(",")}`)
+}
+
+export async function compareBriefs(runIds: string[]): Promise<{ briefs: CompareBrief[] }> {
+  return apiFetch<{ briefs: CompareBrief[] }>(`/api/runs/compare/briefs?runs=${runIds.join(",")}`)
 }
 
 export async function createRun(scenarioPath: string): Promise<{ run_id: string }> {

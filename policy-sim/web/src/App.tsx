@@ -9,6 +9,7 @@ import { BriefDisplay } from "@/components/BriefDisplay"
 import { ValidationPanel } from "@/components/ValidationPanel"
 import { Sidebar } from "@/components/Sidebar"
 import { Card } from "@/components/tremor/Card"
+import { ComparePage } from "@/pages/ComparePage"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tremor/Tabs"
 import type { ArchetypeState } from "@/hooks/useRunStream"
 
@@ -123,6 +124,7 @@ export default function App() {
         {/* Main content — no offset on mobile, sidebar offset from lg+ */}
         <main className="flex-1 lg:pl-72">
           {activeView === "simulation" && <SimulationView />}
+          {activeView === "compare" && <ComparePage />}
           {activeView === "archetypes" && (
             <div className="px-4 md:px-6 py-6">
               <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-50">Archetypes</h2>

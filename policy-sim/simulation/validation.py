@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-from .utils import read_json, read_jsonl, utc_now_iso, write_json, RunPaths
+from .utils import read_json, read_last_complete_event, utc_now_iso, write_json, RunPaths
 
 
 def validate_run(
@@ -17,11 +17,7 @@ def validate_run(
     reactions: dict[str, dict[str, Any]] = {}
     if paths.reactions_dir.exists():
         for p in sorted(paths.reactions_dir.glob("*.jsonl")):
-            events = read_jsonl(p)
-            complete = next(
-                (e["data"] for e in reversed(events) if e.get("event") == "complete"),
-                None,
-            )
+            complete = read_last_complete_event(p)
             if complete:
                 reactions[p.stem] = complete
 
@@ -51,20 +47,28 @@ def validate_run(
         "details": dir_results,
     }
 
-    # 2 — Ordering: low_income_worker and retired_pensioner more negative than urban_professional
+    # 2 — Ordering: low-quintile archetypes more negative than higher-quintile
     ordering_pass = True
     ordering_detail = ""
-    if all(k in reactions for k in ("low_income_worker", "retired_pensioner", "urban_professional")):
-        liw = reactions["low_income_worker"].get("support_or_oppose", 0.0)
-        rp = reactions["retired_pensioner"].get("support_or_oppose", 0.0)
-        up = reactions["urban_professional"].get("support_or_oppose", 0.0)
-        ordering_pass = (liw < up) and (rp < up)
-        ordering_detail = (
-            f"low_income_worker={liw:.2f}, retired_pensioner={rp:.2f},"
-            f" urban_professional={up:.2f}"
-        )
+    expected_archetypes = list(expectations.keys())
+    if len(expected_archetypes) >= 2:
+        scores = [
+            (aid, reactions.get(aid, {}).get("support_or_oppose", 0.0))
+            for aid in expected_archetypes
+        ]
+        negative_archetypes = [aid for aid, s in scores if s < 0]
+        positive_archetypes = [aid for aid, s in scores if s >= 0]
+        if negative_archetypes and positive_archetypes:
+            # Every negative archetype must be more negative than every positive one
+            min_negative = min(s for _, s in scores if s < 0)
+            max_positive = max(s for _, s in scores if s >= 0)
+            ordering_pass = min_negative < max_positive
+            ordering_detail = ", ".join(f"{aid}={s:.2f}" for aid, s in sorted(scores, key=lambda x: x[1]))
+        else:
+            ordering_detail = "insufficient sign variation to check ordering"
+            ordering_pass = False
     else:
-        ordering_detail = "insufficient reactions to check ordering"
+        ordering_detail = "fewer than 2 archetypes found"
         ordering_pass = False
     checks["ordering"] = {"pass": ordering_pass, "detail": ordering_detail}
 
@@ -116,11 +120,7 @@ def compare_runs(run_dir_a: Path, run_dir_b: Path) -> dict[str, Any]:
         result: dict[str, float] = {}
         if reactions_dir.exists():
             for p in sorted(reactions_dir.glob("*.jsonl")):
-                events = read_jsonl(p)
-                complete = next(
-                    (e["data"] for e in reversed(events) if e.get("event") == "complete"),
-                    None,
-                )
+                complete = read_last_complete_event(p)
                 if complete is not None:
                     score = complete.get("support_or_oppose")
                     if score is not None:

@@ -97,6 +97,15 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def read_last_complete_event(path: Path) -> dict[str, Any] | None:
+    """Return the data from the last event with event=="complete" in a JSONL file, or None."""
+    rows = read_jsonl(path)
+    return next(
+        (r["data"] for r in reversed(rows) if r.get("event") == "complete"),
+        None,
+    )
+
+
 def to_python_scalar(value: Any) -> Any:
     """Recursively convert nested structures to plain Python types."""
     if isinstance(value, dict):

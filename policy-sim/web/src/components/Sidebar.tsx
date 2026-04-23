@@ -7,6 +7,7 @@ import {
   RiHome5Line,
   RiMenuLine,
   RiSettings4Line,
+  RiScales3Line,
 } from "@remixicon/react"
 import { cx } from "../lib/tremor/cx"
 import { focusRing } from "../lib/tremor/focusRing"
@@ -21,9 +22,10 @@ import {
 } from "./tremor/Drawer"
 
 const NAV_ITEMS = [
-  { id: "simulation",    label: "Simulation",     icon: RiHome5Line },
-  { id: "archetypes",    label: "Archetypes",       icon: RiBarChartBoxLine },
-  { id: "ifs-validation", label: "IFS Validation", icon: RiFileList3Line },
+  { id: "simulation",       label: "Simulation",      icon: RiHome5Line },
+  { id: "archetypes",       label: "Archetypes",        icon: RiBarChartBoxLine },
+  { id: "ifs-validation",   label: "IFS Validation",   icon: RiFileList3Line },
+  { id: "compare",          label: "Compare",          icon: RiScales3Line },
 ] as const
 
 const SHORTCUTS = [

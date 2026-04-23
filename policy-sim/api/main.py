@@ -12,10 +12,10 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sse_starlette.sse import EventSourceResponse
 
 from simulation.engine import SimulationEngine
-from simulation.utils import RunPaths
+from simulation.utils import RunPaths, read_json, read_last_complete_event
 
 from .auth import ApiKeyMiddleware
-from .scenarios import list_scenarios
+from .scenarios import list_scenarios, list_policies, get_policy
 from .stream import live_stream, replay_stream
 
 # ---------------------------------------------------------------------------
@@ -82,11 +82,17 @@ async def scenarios():
     return list_scenarios()
 
 
+@app.get("/api/policies")
+async def policies():
+    return list_policies()
+
+
 @app.post("/api/runs")
 async def create_run(body: dict):
     scenario_path = body.get("scenario_path")
     if not scenario_path:
         raise HTTPException(status_code=422, detail="scenario_path is required")
+    archetype_ids = body.get("archetype_ids")
     try:
         state = _engine.init_run(scenario_path)
     except FileNotFoundError as exc:
@@ -135,3 +141,68 @@ async def get_audio(run_id: str, filename: str):
     if not audio_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
     return FileResponse(str(audio_path), media_type="audio/mpeg")
+
+
+@app.get("/api/runs/compare")
+async def compare_runs(runs: str):
+    """Side-by-side stance scores for multiple completed runs."""
+    run_ids = [r.strip() for r in runs.split(",") if r.strip()]
+    if not run_ids:
+        raise HTTPException(status_code=422, detail="runs query param required (comma-separated IDs)")
+
+    runs_data: list[dict] = []
+    for run_id in run_ids:
+        run_dir = _RUNS_ROOT / run_id
+        paths = RunPaths(run_dir=run_dir)
+        state_path = run_dir / "state.json"
+        if not state_path.exists():
+            raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
+
+        state = read_json(state_path)
+        scenario_path = state.get("scenario_path", "")
+        policy_label = Path(scenario_path).stem.replace("_", " ").title()
+
+        archetype_scores: dict = {}
+        if paths.reactions_dir.exists():
+            for p in sorted(paths.reactions_dir.glob("*.jsonl")):
+                complete = read_last_complete_event(p)
+                if complete:
+                    archetype_scores[p.stem] = {
+                        "score": complete.get("support_or_oppose", 0.0),
+                        "name": complete.get("display_name", p.stem),
+                    }
+
+        runs_data.append({
+            "run_id": run_id,
+            "policy_label": policy_label,
+            "archetype_scores": archetype_scores,
+        })
+
+    return {"runs": runs_data}
+
+
+@app.get("/api/runs/compare/briefs")
+async def compare_briefs(runs: str):
+    """Side-by-side brief markdown for multiple completed runs."""
+    run_ids = [r.strip() for r in runs.split(",") if r.strip()]
+    if not run_ids:
+        raise HTTPException(status_code=422, detail="runs query param required")
+
+    briefs: list[dict] = []
+    for run_id in run_ids:
+        run_dir = _RUNS_ROOT / run_id
+        paths = RunPaths(run_dir=run_dir)
+        state = read_json(run_dir / "state.json") if (run_dir / "state.json").exists() else {}
+        policy_label = Path(state.get("scenario_path", "")).stem.replace("_", " ").title()
+
+        markdown = ""
+        if paths.brief.exists():
+            markdown = paths.brief.read_text(encoding="utf-8")
+
+        briefs.append({
+            "run_id": run_id,
+            "policy_label": policy_label,
+            "markdown": markdown,
+        })
+
+    return {"briefs": briefs}

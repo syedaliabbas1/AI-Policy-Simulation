@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any, AsyncGenerator
@@ -74,6 +75,7 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
             aid: (lambda a: lambda r: put("reaction_complete", {"archetype_id": a, "reaction": r}))(aid)
             for aid in archetype_ids
         },
+        on_validation_warning=lambda aid, w: put("validation_warning", {"archetype_id": aid, "warning": w}),
         on_audio_ready=lambda aid, fname: put("audio_ready", {"archetype_id": aid, "filename": fname}),
         on_brief_text=lambda t: put("brief_text", {"token": t}),
     )
@@ -103,8 +105,8 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
                             "archetype_id": "brief",
                             "filename": "brief.mp3",
                         }))
-                except Exception:
-                    pass  # TTS failure is non-fatal
+                except Exception as exc:
+                    logging.warning("Brief TTS failed: %s", exc)
 
             if _IFS_PATH.exists() and run_dir.exists():
                 try:

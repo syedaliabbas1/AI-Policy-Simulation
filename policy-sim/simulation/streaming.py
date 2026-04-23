@@ -1,16 +1,19 @@
 """SDK wrapper: streaming with extended thinking, tool use, and prompt caching."""
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 import anthropic
+from anthropic.types.beta import BetaOutputConfigParam, BetaJSONOutputFormatParam
 
 from .caching import make_cache_block
 
-MODEL = "claude-opus-4-7"
-THINKING_BUDGET_TOKENS = 8000
+MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-7")
+THINKING_TYPE = os.environ.get("ANTHROPIC_THINKING_TYPE", "adaptive")
+THINKING_BUDGET = int(os.environ.get("ANTHROPIC_THINKING_BUDGET", "8000"))
 
 # Matches archetype-agent/SKILL.md output spec exactly
 REACTION_TOOL: dict[str, Any] = {
@@ -78,8 +81,8 @@ async def stream_supervisor(
     """Stream supervisor call; parse and return list of briefing dicts."""
     user_content: list[dict[str, Any]] = []
     if knowledge_context:
-        user_content.append(make_cache_block(knowledge_context))
-    user_content.append(make_cache_block(json.dumps(personas, indent=2)))
+        user_content.append(make_cache_block(knowledge_context, ttl="1h"))
+    user_content.append(make_cache_block(json.dumps(personas, indent=2), ttl="1h"))
     user_content.append({
         "type": "text",
         "text": f"Policy document:\n\n{policy_text}\n\nProduce briefings for all four archetypes.",
@@ -89,7 +92,7 @@ async def stream_supervisor(
     async with client.messages.stream(
         model=MODEL,
         max_tokens=4096,
-        system=[make_cache_block(skill_body)],
+        system=[make_cache_block(skill_body, ttl="1h")],
         messages=[{"role": "user", "content": user_content}],
     ) as stream:
         async for event in stream:
@@ -125,11 +128,22 @@ async def stream_archetype(
     tool_parts: list[str] = []
     thinking_emitted = False
 
+    thinking_config = (
+        {"type": "enabled", "budget_tokens": THINKING_BUDGET}
+        if THINKING_TYPE == "enabled"
+        else {"type": "adaptive"}
+    )
+
     async with client.beta.messages.stream(
         model=MODEL,
         max_tokens=16000,
-        thinking={"type": "adaptive"},
-        output_config={"effort": "max"},
+        thinking=thinking_config,
+        output_config=BetaOutputConfigParam(
+            format=BetaJSONOutputFormatParam(
+                type="json_schema",
+                schema=REACTION_TOOL["input_schema"],
+            ),
+        ),
         tools=[REACTION_TOOL],
         tool_choice={"type": "auto"},
         system=[make_cache_block(skill_body)],
@@ -196,10 +210,22 @@ async def stream_reporter(
     """Stream reporter call; return full policy brief as markdown string."""
     parts: list[str] = []
 
-    async with client.messages.stream(
+    thinking_config = (
+        {"type": "enabled", "budget_tokens": THINKING_BUDGET}
+        if THINKING_TYPE == "enabled"
+        else {"type": "adaptive"}
+    )
+
+    async with client.beta.messages.stream(
         model=MODEL,
         max_tokens=4096,
-        system=[make_cache_block(skill_body)],
+        thinking=thinking_config,
+        output_config=BetaOutputConfigParam(
+            format=BetaJSONOutputFormatParam(
+                type="text",
+            ),
+        ),
+        system=[make_cache_block(skill_body, ttl="1h")],
         messages=[
             {
                 "role": "user",

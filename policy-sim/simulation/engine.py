@@ -24,6 +24,7 @@ from .utils import (
     generate_run_id,
     read_json,
     read_jsonl,
+    read_last_complete_event,
     utc_now_iso,
     write_json,
 )
@@ -40,6 +41,7 @@ class RunCallbacks:
     on_thinking: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
     on_reaction_delta: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
     on_reaction_complete: dict[str, Callable[[dict], Awaitable[None]]] = field(default_factory=dict)
+    on_validation_warning: Callable[[str, dict[str, Any]], Awaitable[None]] | None = None
     # Called with (archetype_id, audio_filename) once TTS is written
     on_audio_ready: Callable[[str, str], Awaitable[None]] | None = None
     on_brief_text: TextCallback = None
@@ -49,7 +51,12 @@ class RunCallbacks:
 class SimulationEngine:
     """Orchestrates the full simulation pipeline with persisted run state."""
 
-    def __init__(self, runs_root: str | Path = "simulation_runs") -> None:
+    def __init__(
+        self,
+        runs_root: str | Path = "simulation_runs",
+        ifs_data_path: Path | None = None,
+        archetype_ids: list[str] | None = None,
+    ) -> None:
         self.runs_root = Path(runs_root)
         self.runs_root.mkdir(parents=True, exist_ok=True)
         self._client = anthropic.AsyncAnthropic()
@@ -59,10 +66,23 @@ class SimulationEngine:
         self._archetype_skill = skills / "archetype-agent" / "SKILL.md"
         self._reporter_skill = skills / "reporting-agent" / "SKILL.md"
 
-        self._personas: list[dict[str, Any]] = [
+        all_personas = [
             read_json(p)
             for p in sorted((_PROJECT_ROOT / "data" / "archetypes").glob("*.json"))
         ]
+        if archetype_ids is not None:
+            by_id = {p["id"]: p for p in all_personas}
+            self._personas = [by_id[a] for a in archetype_ids if a in by_id]
+        else:
+            self._personas = all_personas
+
+        # Load IFS validation expectations for early-validation checks
+        self._ifs_expectations: dict[str, Any] = {}
+        if ifs_data_path is None:
+            ifs_data_path = _PROJECT_ROOT / "knowledge_base" / "fiscal" / "ifs_2011_validation.json"
+        if Path(ifs_data_path).exists():
+            ifs_data = read_json(ifs_data_path)
+            self._ifs_expectations = ifs_data.get("archetype_validation_expectations", {})
 
     # ------------------------------------------------------------------
     # Path / state helpers
@@ -97,6 +117,7 @@ class SimulationEngine:
             "updated_at": utc_now_iso(),
             "status": "initialized",
             "scenario_path": str(scenario_path),
+            "archetype_ids": [p["id"] for p in self._personas],
         }
         self._save_state(run_id, state)
         return state
@@ -188,6 +209,21 @@ class SimulationEngine:
             if on_complete:
                 await on_complete(reaction)
 
+            # Early-validation: check sign against IFS expectation, surface warning without stopping pipeline
+            if self._ifs_expectations and cbs.on_validation_warning:
+                exp = self._ifs_expectations.get(archetype_id)
+                if exp:
+                    score = reaction.get("support_or_oppose", 0.0)
+                    expected_sign = exp.get("expected_support_or_oppose_sign", -1)
+                    if score * expected_sign <= 0:
+                        warning = {
+                            "archetype_id": archetype_id,
+                            "score": score,
+                            "expected_sign": expected_sign,
+                            "rule": exp.get("validation_rule", ""),
+                        }
+                        await cbs.on_validation_warning(archetype_id, warning)
+
             # TTS — synthesise immediate_impact line, fire on_audio_ready when done
             if cbs.tts_enabled:
                 audio_dir = paths.run_dir / "audio"
@@ -225,11 +261,7 @@ class SimulationEngine:
         reactions: dict[str, dict[str, Any]] = {}
         if paths.reactions_dir.exists():
             for p in sorted(paths.reactions_dir.glob("*.jsonl")):
-                events = read_jsonl(p)
-                complete = next(
-                    (e["data"] for e in reversed(events) if e.get("event") == "complete"),
-                    None,
-                )
+                complete = read_last_complete_event(p)
                 if complete:
                     reactions[p.stem] = complete
 
