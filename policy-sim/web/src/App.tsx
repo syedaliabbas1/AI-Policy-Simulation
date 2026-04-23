@@ -57,7 +57,7 @@ function SimulationView() {
       {/* KPI row */}
       {showKPI && (
         <div className="max-w-screen-xl mx-auto w-full px-4 pt-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {displayIds.map((id) => (
               <KPICard key={id} archetypeId={id} state={state.archetypes[id]} />
             ))}
@@ -65,9 +65,9 @@ function SimulationView() {
         </div>
       )}
 
-      {/* 2×2 archetype grid — shown as tabs on mobile, grid on lg */}
+      {/* Archetype grid — 2×2 on md+, tabs below md */}
       <main className="flex-1 max-w-screen-xl mx-auto w-full p-4">
-        <div className="hidden lg:grid lg:grid-cols-2 lg:gap-3" style={{ minHeight: "420px" }}>
+        <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-2 gap-3" style={{ minHeight: "420px" }}>
           {displayIds.map((id) => (
             <ArchetypeCard
               key={id}
@@ -78,8 +78,8 @@ function SimulationView() {
           ))}
         </div>
 
-        {/* Mobile tabs */}
-        <div className="lg:hidden">
+        {/* Mobile tabs (<md) */}
+        <div className="md:hidden">
           <Tabs defaultValue={displayIds[0]}>
             <TabsList className="mb-3">
               {displayIds.map((id) => (
