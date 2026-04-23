@@ -3,7 +3,12 @@
     "allow": [
       "Bash(npx *)",
       "Bash(MSYS_NO_PATHCONV=1 npx *)",
-      "Bash(edge-tts --list-voices)"
+      "Bash(edge-tts --list-voices)",
+      "PowerShell(az account show *)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(Get-Item \"C:\\\\Program Files \\(x86\\)\\\\Microsoft SDKs\\\\Azure\\\\CLI2\\\\wbin\\\\az.cmd\" -ErrorAction SilentlyContinue; Get-Item \"C:\\\\Program Files\\\\Microsoft SDKs\\\\Azure\\\\CLI2\\\\wbin\\\\az.cmd\" -ErrorAction SilentlyContinue; & \"$env:LOCALAPPDATA\\\\Programs\\\\Azure CLI\\\\wbin\\\\az.cmd\" account show 2>&1 | Select-Object -First 5)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Microsoft SDKs\\\\Azure\\\\CLI2\\\\wbin\\\\az.cmd\" account show 2>&1 | Select-Object -First 20)",
+      "PowerShell(Invoke-RestMethod -Uri \"https://policy-sim.azurewebsites.net/api/health\" -Method Get 2>&1)"
     ]
   }
 }
