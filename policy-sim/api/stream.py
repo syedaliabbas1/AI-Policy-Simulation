@@ -191,9 +191,13 @@ async def replay_stream(run_id: str, delay_ms: int = 30) -> AsyncGenerator[dict,
             yield _frame("audio_ready", {"archetype_id": mp3.stem, "filename": mp3.name})
             await asyncio.sleep(delay_ms / 1000)
 
-    # Brief done — emit from saved brief.md
+    # Brief — stream token-by-token so phase transitions to "reporting", then brief_done
     if paths.brief.exists():
         brief_text = paths.brief.read_text(encoding="utf-8")
+        chunk = 8  # characters per paced token
+        for i in range(0, len(brief_text), chunk):
+            yield _frame("brief_text", {"token": brief_text[i:i + chunk]})
+            await asyncio.sleep(delay_ms / 1000)
         yield _frame("brief_done", {"markdown": brief_text})
         await asyncio.sleep(delay_ms / 1000)
 

@@ -79,7 +79,7 @@ function openEventSource(url: string, signal?: AbortSignal): AsyncGenerator<RunE
           const item = queue.shift()!
           if (item === null) return
           if (item instanceof Error) throw item
-          if (item.type === "done") { es.close(); return }
+          if (item.type === "done") { yield item; es.close(); return }
           yield item
         }
       }
