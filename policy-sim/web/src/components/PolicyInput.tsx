@@ -20,7 +20,8 @@ export function PolicyInput({ phase, onRun, onStop }: Props) {
     listScenarios()
       .then((s) => {
         setScenarios(s)
-        if (s.length > 0) setSelected(s[0].path)
+        const vat = s.find((x) => x.name.includes("uk_vat_2010")) ?? s[0]
+        if (vat) setSelected(vat.path)
       })
       .catch(() => {
         // API not reachable — set a placeholder for demo
