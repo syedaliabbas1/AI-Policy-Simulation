@@ -2,7 +2,7 @@
 
 A multi-agent AI system that generates structured stakeholder reasoning for proposed fiscal policies in minutes — validated against published distributional evidence.
 
-Live demo: **https://policysim.tech**
+Live demo: **https://ai-policy-simulation.vercel.app**
 
 ---
 
