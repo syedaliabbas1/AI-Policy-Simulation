@@ -21,6 +21,7 @@ export interface RunState {
   briefings: Record<string, Briefing>
   archetypes: Record<string, ArchetypeState>
   briefMarkdown: string
+  briefAudioUrl: string | null
   validation: ValidationResult | null
   error: string | null
 }
@@ -33,6 +34,7 @@ const initialState: RunState = {
   briefings: {},
   archetypes: {},
   briefMarkdown: "",
+  briefAudioUrl: null,
   validation: null,
   error: null,
 }
@@ -89,6 +91,9 @@ function reducer(state: RunState, action: Action): RunState {
     }
 
     case "AUDIO_READY": {
+      if (action.archetypeId === "brief") {
+        return { ...state, briefAudioUrl: action.audioUrl }
+      }
       const prev = state.archetypes[action.archetypeId] ?? archetypeDefault()
       return { ...state, archetypes: { ...state.archetypes, [action.archetypeId]: { ...prev, audioUrl: action.audioUrl } } }
     }

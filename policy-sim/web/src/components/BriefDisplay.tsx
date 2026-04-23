@@ -7,6 +7,7 @@ interface Props {
   phase: Phase
   markdown: string
   archetypes: Record<string, { reaction: Reaction | null; complete: boolean }>
+  briefAudioUrl: string | null
 }
 
 const ARCHETYPE_NAMES: Record<string, string> = {
@@ -84,7 +85,7 @@ function StanceChart({ archetypes }: { archetypes: Props["archetypes"] }) {
   )
 }
 
-export function BriefDisplay({ phase, markdown, archetypes }: Props) {
+export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Props) {
   if (phase === "idle") return null
   const isStreaming = phase === "reporting"
 
@@ -93,11 +94,17 @@ export function BriefDisplay({ phase, markdown, archetypes }: Props) {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-6 rounded-full bg-amber-600" />
-          <div>
+          <div className="flex-1">
             <h2 className="text-sm font-semibold text-slate-900">Policy Analysis Brief</h2>
             <span className="text-xs text-slate-400">{isStreaming ? "Generating…" : "Completed"}</span>
           </div>
           {isStreaming && <span className="cursor-blink text-amber-600 ml-1" />}
+          {briefAudioUrl && (
+            <div className="flex items-center gap-2">
+              <span className="label-caps">Narration</span>
+              <audio controls src={briefAudioUrl} className="h-8" style={{ width: "200px", colorScheme: "light" }} />
+            </div>
+          )}
         </div>
 
         <StanceChart archetypes={archetypes} />

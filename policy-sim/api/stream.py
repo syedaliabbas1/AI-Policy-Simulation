@@ -6,10 +6,28 @@ import os
 from pathlib import Path
 from typing import Any, AsyncGenerator
 
+import re
+
 from simulation.engine import RunCallbacks, SimulationEngine
 from simulation.replay import replay_run
+from simulation.tts import synthesise
 from simulation.utils import read_json, read_jsonl, RunPaths
 from simulation.validation import validate_run
+
+_BRIEF_VOICE = "en-GB-RyanNeural"
+
+
+def _extract_brief_summary(markdown: str) -> str:
+    """Extract the Summary section from the brief for TTS, stripping markdown."""
+    # Find text between ## Summary and next ## heading
+    match = re.search(r"##\s*Summary\s*\n(.*?)(?=\n##|\Z)", markdown, re.DOTALL | re.IGNORECASE)
+    text = match.group(1).strip() if match else markdown[:800]
+    # Strip markdown: headings, bold, italic, bullet points, links
+    text = re.sub(r"\*{1,2}([^*]+)\*{1,2}", r"\1", text)
+    text = re.sub(r"`[^`]+`", "", text)
+    text = re.sub(r"^\s*[-*>]\s*", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    return text.strip()
 
 _IFS_PATH = Path(__file__).parent.parent / "knowledge_base" / "fiscal" / "ifs_2011_validation.json"
 _RUNS_ROOT = Path(os.environ.get("SIMULATION_RUNS_ROOT", str(Path(__file__).parent.parent / "simulation_runs")))
@@ -73,6 +91,21 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
             await queue.put(_frame("brief_done", {"markdown": brief_text}))
 
             run_dir = _RUNS_ROOT / run_id
+
+            # Brief narration TTS
+            brief_audio_path = run_dir / "audio" / "brief.mp3"
+            if not brief_audio_path.exists():
+                try:
+                    summary_text = _extract_brief_summary(brief_text)
+                    if summary_text:
+                        await synthesise(summary_text, _BRIEF_VOICE, brief_audio_path)
+                        await queue.put(_frame("audio_ready", {
+                            "archetype_id": "brief",
+                            "filename": "brief.mp3",
+                        }))
+                except Exception:
+                    pass  # TTS failure is non-fatal
+
             if _IFS_PATH.exists() and run_dir.exists():
                 try:
                     validation = validate_run(run_dir, _IFS_PATH)
@@ -190,21 +223,28 @@ async def replay_stream(run_id: str, delay_ms: int = 30) -> AsyncGenerator[dict,
         task.cancel()
         raise
 
-    # Audio — emit audio_ready for any cached mp3 files
+    # Audio — emit audio_ready for archetype mp3s (excluding brief.mp3 — emitted after brief)
     audio_dir = run_dir / "audio"
     if audio_dir.exists():
         for mp3 in sorted(audio_dir.glob("*.mp3")):
-            yield _frame("audio_ready", {"archetype_id": mp3.stem, "filename": mp3.name})
-            await asyncio.sleep(delay_ms / 1000)
+            if mp3.stem != "brief":
+                yield _frame("audio_ready", {"archetype_id": mp3.stem, "filename": mp3.name})
+                await asyncio.sleep(delay_ms / 1000)
 
     # Brief — stream token-by-token so phase transitions to "reporting", then brief_done
     if paths.brief.exists():
         brief_text = paths.brief.read_text(encoding="utf-8")
-        chunk = 8  # characters per paced token
+        chunk = 8
         for i in range(0, len(brief_text), chunk):
             yield _frame("brief_text", {"token": brief_text[i:i + chunk]})
             await asyncio.sleep(delay_ms / 1000)
         yield _frame("brief_done", {"markdown": brief_text})
+        await asyncio.sleep(delay_ms / 1000)
+
+    # Brief narration audio
+    brief_mp3 = run_dir / "audio" / "brief.mp3"
+    if brief_mp3.exists():
+        yield _frame("audio_ready", {"archetype_id": "brief", "filename": "brief.mp3"})
         await asyncio.sleep(delay_ms / 1000)
 
     # Validation — emit from saved validation.json

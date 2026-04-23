@@ -84,6 +84,7 @@ export default function App() {
         phase={state.phase}
         markdown={state.briefMarkdown}
         archetypes={state.archetypes}
+        briefAudioUrl={state.briefAudioUrl}
       />
 
       <ValidationPanel validation={state.validation} />
