@@ -55,7 +55,7 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
 
   return (
     <section className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#090E1A]">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-1 h-6 rounded-full bg-blue-500" />
           <div className="flex-1">

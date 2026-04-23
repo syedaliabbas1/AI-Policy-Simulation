@@ -109,10 +109,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {/* ── Mobile top bar (xs-lg) ─────────────────────── */}
       <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-3 shadow-sm dark:border-gray-800 dark:bg-[#090E1A] lg:hidden">
         <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-md bg-blue-500">
+          <div className="flex size-7 items-center justify-center rounded-md bg-blue-500 shrink-0">
             <span className="text-xs font-semibold text-white">PS</span>
           </div>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-50">Policy Sim</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-50 truncate">Policy Sim</span>
         </div>
         <div className="flex items-center gap-1">
           <DarkModeToggle className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800" />

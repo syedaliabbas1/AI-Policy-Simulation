@@ -17,7 +17,7 @@ export function ValidationPanel({ validation }: Props) {
 
   return (
     <section className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#090E1A]">
-      <div className="max-w-4xl mx-auto px-6 py-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-5 md:py-6">
         <div className="flex items-center gap-3 mb-5">
           <div className="w-1 h-5 rounded-full bg-blue-500" />
           <div>

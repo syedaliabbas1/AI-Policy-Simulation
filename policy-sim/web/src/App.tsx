@@ -67,7 +67,7 @@ function SimulationView() {
 
       {/* Archetype grid — 2×2 on md+, tabs below md */}
       <main className="flex-1 max-w-screen-xl mx-auto w-full p-4">
-        <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-2 gap-3" style={{ minHeight: "420px" }}>
+        <div className="hidden md:grid md:grid-cols-2 gap-3" style={{ minHeight: "420px" }}>
           {displayIds.map((id) => (
             <ArchetypeCard
               key={id}
@@ -120,20 +120,20 @@ export default function App() {
       <div className="flex min-h-screen bg-white dark:bg-gray-950">
         <Sidebar activeView={activeView} onViewChange={setActiveView} />
 
-        {/* Main content — offset by sidebar width on lg */}
+        {/* Main content — no offset on mobile, sidebar offset from lg+ */}
         <main className="flex-1 lg:pl-72">
           {activeView === "simulation" && <SimulationView />}
           {activeView === "archetypes" && (
-            <div className="p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Archetypes</h2>
+            <div className="px-4 md:px-6 py-6">
+              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-50">Archetypes</h2>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
                 Archetype analysis view coming soon.
               </p>
             </div>
           )}
           {activeView === "ifs-validation" && (
-            <div className="p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">IFS Validation</h2>
+            <div className="px-4 md:px-6 py-6">
+              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-50">IFS Validation</h2>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
                 IFS validation data and comparisons shown here.
               </p>

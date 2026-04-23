@@ -31,31 +31,30 @@ export function SupervisorBriefing({ phase, text, briefings }: Props) {
 
   return (
     <div
-      className="border-b border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-500"
-      style={{ maxHeight: collapsed ? "38px" : "140px", background: "var(--tremor-background-subtle, #f8fafc)", darkModeBackground: "#0f172a" }}
-      data-dark-bg="true"
+      className="border-b border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-500 bg-gray-50 dark:bg-gray-900"
+      style={{ maxHeight: collapsed ? "38px" : "140px" }}
     >
       {collapsed ? (
         <button
           onClick={() => setCollapsed(false)}
-          className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="w-full flex items-center gap-3 px-4 md:px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Supervisor</span>
-          <span className="text-xs text-gray-400 dark:text-gray-600">
+          <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 shrink-0">Supervisor</span>
+          <span className="text-xs text-gray-400 dark:text-gray-600 truncate">
             {briefingCount} archetype briefings generated
           </span>
-          <span className="ml-auto text-xs text-gray-400 dark:text-gray-600">expand</span>
+          <span className="ml-auto text-xs text-gray-400 dark:text-gray-600 shrink-0">expand</span>
         </button>
       ) : (
-        <div className="px-6 py-3">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">Supervisor Analysis</span>
+        <div className="px-4 md:px-6 py-3">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 shrink-0">Supervisor Analysis</span>
             {streaming && (
-              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 animate-pulse">Streaming</span>
+              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 animate-pulse shrink-0">Streaming</span>
             )}
             {briefingCount > 0 && (
-              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 ml-auto">
-                {briefingCount}/4 briefings ready
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 ml-auto shrink-0">
+                {briefingCount}/4 ready
               </span>
             )}
           </div>
