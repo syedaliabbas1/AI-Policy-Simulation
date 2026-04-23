@@ -35,8 +35,14 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
     async def put(event: str, data: Any) -> None:
         await queue.put(_frame(event, data))
 
+    supervisor_parts: list[str] = []
+
+    async def on_supervisor_token(token: str) -> None:
+        supervisor_parts.append(token)
+        await put("supervisor_text", {"token": token})
+
     callbacks = RunCallbacks(
-        on_supervisor_text=lambda t: put("supervisor_text", {"token": t}),
+        on_supervisor_text=on_supervisor_token,
         on_thinking={
             aid: (lambda a: lambda t: put("thinking", {"archetype_id": a, "token": t}))(aid)
             for aid in archetype_ids
@@ -57,6 +63,12 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
         try:
             briefings = await engine.brief(run_id, on_supervisor_text=callbacks.on_supervisor_text)
             briefings_by_id = {b["archetype_id"]: b for b in briefings}
+
+            # Persist supervisor text for replay
+            if supervisor_parts:
+                sup_path = _RUNS_ROOT / run_id / "supervisor_text.txt"
+                sup_path.write_text("".join(supervisor_parts), encoding="utf-8")
+
             await queue.put(_frame("supervisor_done", {"briefings": briefings_by_id}))
 
             await engine.react_parallel(run_id, callbacks=callbacks)
@@ -114,6 +126,15 @@ async def replay_stream(run_id: str, delay_ms: int = 30) -> AsyncGenerator[dict,
     })
 
     await asyncio.sleep(delay_ms / 1000)
+
+    # Supervisor text — stream token-by-token if saved, else skip
+    sup_text_path = run_dir / "supervisor_text.txt"
+    if sup_text_path.exists():
+        sup_text = sup_text_path.read_text(encoding="utf-8")
+        chunk = 6  # characters per token for paced replay
+        for i in range(0, len(sup_text), chunk):
+            yield _frame("supervisor_text", {"token": sup_text[i:i + chunk]})
+            await asyncio.sleep(delay_ms / 1000)
 
     # Supervisor done — emit from saved briefings
     if paths.briefings_dir.exists():
