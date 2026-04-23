@@ -1,0 +1,207 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Policy-Sim Design System ─────────────────────────── */
+:root {
+  /* Core palette — dark always on */
+  --ps-bg:          #0b0e13;
+  --ps-surface:     #111620;
+  --ps-surface-2:   #161d2a;
+  --ps-border:      #1e2738;
+  --ps-border-2:    #263047;
+
+  /* Typography */
+  --ps-text:        #d4cfc8;
+  --ps-text-muted:  #606878;
+  --ps-text-faint:  #3a4254;
+  --ps-heading:     #ede8df;
+
+  /* Single accent: government gold */
+  --ps-gold:        #e8b84b;
+  --ps-gold-dim:    rgba(232, 184, 75, 0.12);
+  --ps-gold-border: rgba(232, 184, 75, 0.25);
+
+  /* Terminal / thinking stream */
+  --ps-terminal:    #34c759;
+  --ps-terminal-bg: rgba(52, 199, 89, 0.06);
+
+  /* Stance colours */
+  --ps-support:     #22c55e;
+  --ps-oppose:      #ef4444;
+  --ps-neutral:     #6b7280;
+
+  /* Fonts */
+  --font-ui:        'Geist Variable', sans-serif;
+  --font-document:  'EB Garamond', Georgia, serif;
+  --font-mono:      'GeistMono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  /* Shadows */
+  --ps-shadow:      0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --ps-shadow-card: 0 0 0 1px var(--ps-border), 0 2px 8px rgba(0,0,0,0.5);
+
+  /* shadcn dark overrides (always dark) */
+  --background:     var(--ps-bg);
+  --foreground:     var(--ps-heading);
+  --card:           var(--ps-surface);
+  --card-foreground: var(--ps-text);
+  --border:         var(--ps-border);
+  --input:          var(--ps-border-2);
+  --ring:           var(--ps-gold-border);
+  --primary:        var(--ps-gold);
+  --primary-foreground: #0b0e13;
+  --secondary:      var(--ps-surface-2);
+  --secondary-foreground: var(--ps-text);
+  --muted:          var(--ps-surface-2);
+  --muted-foreground: var(--ps-text-muted);
+  --accent:         var(--ps-gold-dim);
+  --accent-foreground: var(--ps-gold);
+  --destructive:    oklch(0.577 0.245 27.325);
+  --radius:         0.375rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-ui);
+  --font-heading: var(--font-document);
+  --font-mono: var(--font-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 1.5);
+  --radius-xl: calc(var(--radius) * 2);
+  --color-ps-gold: var(--ps-gold);
+  --color-ps-terminal: var(--ps-terminal);
+  --color-ps-support: var(--ps-support);
+  --color-ps-oppose: var(--ps-oppose);
+  --color-ps-surface: var(--ps-surface);
+  --color-ps-surface-2: var(--ps-surface-2);
+  --color-ps-border: var(--ps-border);
+  --color-ps-text: var(--ps-text);
+  --color-ps-muted: var(--ps-text-muted);
+  --color-ps-bg: var(--ps-bg);
+}
+
+/* ── Base reset ───────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+    background: var(--ps-bg);
+  }
+
+  body {
+    margin: 0;
+    background: var(--ps-bg);
+    color: var(--ps-text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100svh;
+    background: var(--ps-bg);
+  }
+}
+
+/* ── Utility classes ──────────────────────────────────── */
+@layer utilities {
+  .font-document { font-family: var(--font-document); }
+  .font-mono-ps  { font-family: var(--font-mono); }
+
+  .text-ps-gold    { color: var(--ps-gold); }
+  .text-ps-muted   { color: var(--ps-text-muted); }
+  .text-ps-faint   { color: var(--ps-text-faint); }
+  .text-ps-heading { color: var(--ps-heading); }
+  .text-terminal   { color: var(--ps-terminal); }
+  .text-support    { color: var(--ps-support); }
+  .text-oppose     { color: var(--ps-oppose); }
+
+  .bg-ps-surface   { background: var(--ps-surface); }
+  .bg-ps-surface-2 { background: var(--ps-surface-2); }
+  .bg-ps-bg        { background: var(--ps-bg); }
+  .bg-terminal-dim { background: var(--ps-terminal-bg); }
+  .bg-gold-dim     { background: var(--ps-gold-dim); }
+
+  .border-ps       { border-color: var(--ps-border); }
+  .border-ps-2     { border-color: var(--ps-border-2); }
+  .border-gold-dim { border-color: var(--ps-gold-border); }
+
+  .label-caps {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ps-text-muted);
+  }
+
+  .label-caps-gold {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ps-gold);
+  }
+
+  /* Blinking cursor for streaming text */
+  .cursor-blink::after {
+    content: '▋';
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    margin-left: 1px;
+    opacity: 0.8;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.8; }
+    50%       { opacity: 0; }
+  }
+
+  /* Thinking text — terminal green monospace */
+  .thinking-stream {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1.55;
+    color: var(--ps-terminal);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Card hover glow */
+  .card-glow {
+    transition: box-shadow 0.2s ease;
+  }
+  .card-glow:hover {
+    box-shadow: 0 0 0 1px var(--ps-gold-border), 0 4px 20px rgba(232, 184, 75, 0.06);
+  }
+
+  /* Stance gradient bar */
+  .stance-track {
+    height: 3px;
+    background: linear-gradient(90deg, var(--ps-oppose) 0%, var(--ps-text-faint) 50%, var(--ps-support) 100%);
+    border-radius: 2px;
+    position: relative;
+  }
+}
