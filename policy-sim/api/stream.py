@@ -49,6 +49,7 @@ async def live_stream(run_id: str, engine: SimulationEngine) -> AsyncGenerator[d
             aid: (lambda a: lambda r: put("reaction_complete", {"archetype_id": a, "reaction": r}))(aid)
             for aid in archetype_ids
         },
+        on_audio_ready=lambda aid, fname: put("audio_ready", {"archetype_id": aid, "filename": fname}),
         on_brief_text=lambda t: put("brief_text", {"token": t}),
     )
 
@@ -161,6 +162,13 @@ async def replay_stream(run_id: str, delay_ms: int = 30) -> AsyncGenerator[dict,
     except asyncio.CancelledError:
         task.cancel()
         raise
+
+    # Audio — emit audio_ready for any cached mp3 files
+    audio_dir = run_dir / "audio"
+    if audio_dir.exists():
+        for mp3 in sorted(audio_dir.glob("*.mp3")):
+            yield _frame("audio_ready", {"archetype_id": mp3.stem, "filename": mp3.name})
+            await asyncio.sleep(delay_ms / 1000)
 
     # Brief done — emit from saved brief.md
     if paths.brief.exists():

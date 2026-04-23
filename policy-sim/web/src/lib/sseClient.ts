@@ -48,7 +48,7 @@ function openEventSource(url: string, signal?: AbortSignal): AsyncGenerator<RunE
   const eventTypes = [
     "run_started", "supervisor_text", "supervisor_done",
     "thinking", "reaction_delta", "reaction_complete",
-    "brief_text", "brief_done", "validation", "done", "error",
+    "audio_ready", "brief_text", "brief_done", "validation", "done", "error",
   ]
 
   for (const eventType of eventTypes) {

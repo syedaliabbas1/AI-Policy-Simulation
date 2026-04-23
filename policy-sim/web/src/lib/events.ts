@@ -33,5 +33,6 @@ export type RunEvent =
   | { type: "brief_text"; token: string }
   | { type: "brief_done"; markdown: string }
   | ({ type: "validation" } & ValidationResult)
+  | { type: "audio_ready"; archetype_id: string; filename: string }
   | { type: "done" }
   | { type: "error"; phase: string; message: string }

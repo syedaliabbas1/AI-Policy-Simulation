@@ -10,6 +10,7 @@ export interface ArchetypeState {
   reactionTokens: string
   reaction: Reaction | null
   complete: boolean
+  audioUrl: string | null
 }
 
 export interface RunState {
@@ -44,6 +45,7 @@ type Action =
   | { type: "THINKING_TOKEN"; archetypeId: string; token: string }
   | { type: "REACTION_TOKEN"; archetypeId: string; token: string }
   | { type: "REACTION_COMPLETE"; archetypeId: string; reaction: Reaction }
+  | { type: "AUDIO_READY"; archetypeId: string; audioUrl: string }
   | { type: "BRIEF_TOKEN"; token: string }
   | { type: "BRIEF_DONE"; markdown: string }
   | { type: "VALIDATION"; result: ValidationResult }
@@ -51,7 +53,7 @@ type Action =
   | { type: "ERROR"; message: string }
 
 function archetypeDefault(): ArchetypeState {
-  return { thinking: "", reactionTokens: "", reaction: null, complete: false }
+  return { thinking: "", reactionTokens: "", reaction: null, complete: false, audioUrl: null }
 }
 
 function reducer(state: RunState, action: Action): RunState {
@@ -84,6 +86,11 @@ function reducer(state: RunState, action: Action): RunState {
     case "REACTION_COMPLETE": {
       const prev = state.archetypes[action.archetypeId] ?? archetypeDefault()
       return { ...state, archetypes: { ...state.archetypes, [action.archetypeId]: { ...prev, reaction: action.reaction, complete: true } } }
+    }
+
+    case "AUDIO_READY": {
+      const prev = state.archetypes[action.archetypeId] ?? archetypeDefault()
+      return { ...state, archetypes: { ...state.archetypes, [action.archetypeId]: { ...prev, audioUrl: action.audioUrl } } }
     }
 
     case "BRIEF_TOKEN":
@@ -144,6 +151,11 @@ export function useRunStream() {
           case "reaction_complete":
             dispatch({ type: "REACTION_COMPLETE", archetypeId: event.archetype_id, reaction: event.reaction })
             break
+          case "audio_ready": {
+            const audioUrl = `/api/runs/${runId}/audio/${event.filename}`
+            dispatch({ type: "AUDIO_READY", archetypeId: event.archetype_id, audioUrl })
+            break
+          }
           case "brief_text":
             dispatch({ type: "BRIEF_TOKEN", token: event.token })
             break

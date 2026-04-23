@@ -15,6 +15,20 @@ interface Props {
   briefing: Briefing | undefined
 }
 
+function AudioPlayer({ url }: { url: string }) {
+  return (
+    <div className="mt-3 pt-3 border-t border-ps">
+      <span className="label-caps block mb-1.5">Voice</span>
+      <audio
+        controls
+        src={url}
+        className="w-full h-8"
+        style={{ colorScheme: "light" }}
+      />
+    </div>
+  )
+}
+
 function PortraitAvatar({ archetypeId, name }: { archetypeId: string; name: string }) {
   const [hasImage, setHasImage] = useState(true)
   return (
@@ -168,7 +182,10 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
         {!archetypeState ? (
           <p className="text-xs text-slate-400 italic">Awaiting briefing…</p>
         ) : hasReaction ? (
-          <ReactionDisplay reaction={archetypeState.reaction!} />
+          <>
+            <ReactionDisplay reaction={archetypeState.reaction!} />
+            {archetypeState.audioUrl && <AudioPlayer url={archetypeState.audioUrl} />}
+          </>
         ) : (
           /* Thinking phase — deliberate dark terminal block */
           <div className="relative">

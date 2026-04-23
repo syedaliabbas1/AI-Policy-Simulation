@@ -9,6 +9,7 @@ import anthropic
 from dotenv import load_dotenv
 
 from .caching import make_cache_block
+from .tts import synthesise_reaction
 from .streaming import (
     EventCallback,
     TextCallback,
@@ -34,12 +35,15 @@ _PROJECT_ROOT = Path(__file__).parent.parent
 
 @dataclass
 class RunCallbacks:
-    """Optional UI callbacks supplied by the Streamlit app (or CLI printer)."""
+    """Optional UI callbacks supplied by the Streamlit app or API layer."""
     on_supervisor_text: TextCallback = None
     on_thinking: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
     on_reaction_delta: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
     on_reaction_complete: dict[str, Callable[[dict], Awaitable[None]]] = field(default_factory=dict)
+    # Called with (archetype_id, audio_filename) once TTS is written
+    on_audio_ready: Callable[[str, str], Awaitable[None]] | None = None
     on_brief_text: TextCallback = None
+    tts_enabled: bool = True
 
 
 class SimulationEngine:
@@ -183,6 +187,17 @@ class SimulationEngine:
             on_complete = cbs.on_reaction_complete.get(archetype_id)
             if on_complete:
                 await on_complete(reaction)
+
+            # TTS — synthesise immediate_impact line, fire on_audio_ready when done
+            if cbs.tts_enabled:
+                audio_dir = paths.run_dir / "audio"
+                voice_id = persona.get("voice_id")
+                audio_path = await synthesise_reaction(
+                    archetype_id, reaction, audio_dir, voice_id=voice_id
+                )
+                if audio_path and cbs.on_audio_ready:
+                    await cbs.on_audio_ready(archetype_id, audio_path.name)
+
             return archetype_id, reaction
 
         results = await asyncio.gather(*[_react_one(p) for p in self._personas])
