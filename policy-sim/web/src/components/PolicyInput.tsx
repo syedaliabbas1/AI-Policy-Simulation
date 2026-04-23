@@ -24,7 +24,6 @@ export function PolicyInput({ phase, onRun, onStop }: Props) {
         if (vat) setSelected(vat.path)
       })
       .catch(() => {
-        // API not reachable — set a placeholder for demo
         setSelected("knowledge_base/fiscal/uk_vat_2010.md")
       })
   }, [])
@@ -38,86 +37,91 @@ export function PolicyInput({ phase, onRun, onStop }: Props) {
     }
   }
 
-  return (
-    <header className="border-b border-ps sticky top-0 z-50" style={{ background: "var(--ps-bg)" }}>
-      {/* System header */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-ps">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-ps-gold" style={{ boxShadow: "0 0 6px var(--ps-gold)" }} />
-          <span className="label-caps-gold tracking-widest">Policy Simulation System</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="label-caps">
-            {phase === "idle" ? "READY" :
-             phase === "supervisor" ? "BRIEFING ARCHETYPES" :
-             phase === "reacting" ? "REASONING IN PROGRESS" :
-             phase === "reporting" ? "GENERATING BRIEF" :
-             phase === "done" ? "COMPLETE" :
-             "ACTIVE"}
-          </span>
-          {running && (
-            <span className="inline-flex gap-0.5">
-              {[0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  className="w-1 h-1 rounded-full bg-ps-gold"
-                  style={{ animation: `blink 1.2s step-end ${i * 0.3}s infinite` }}
-                />
-              ))}
-            </span>
-          )}
-        </div>
-      </div>
+  const statusLabel =
+    phase === "idle"       ? "Ready" :
+    phase === "supervisor" ? "Briefing archetypes" :
+    phase === "reacting"   ? "Reasoning in progress" :
+    phase === "reporting"  ? "Generating brief" :
+    phase === "done"       ? "Complete" : "Active"
 
-      {/* Controls */}
-      <div className="flex items-center gap-3 px-6 py-3">
-        {/* Scenario picker */}
-        <div className="flex-1 flex items-center gap-2">
+  return (
+    <header className="bg-white border-b border-ps sticky top-0 z-50" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+      <div className="max-w-screen-xl mx-auto px-6 py-0">
+        {/* Brand bar */}
+        <div className="flex items-center justify-between h-12 border-b border-ps">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2 h-2 rounded-full bg-amber-600" />
+            <span className="text-xs font-semibold tracking-widest uppercase text-amber-700">
+              Policy Simulation System
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={["text-xs font-medium", running ? "text-amber-700" : "text-slate-400"].join(" ")}>
+              {statusLabel}
+            </span>
+            {running && (
+              <span className="inline-flex gap-0.5 ml-1">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="w-1 h-1 rounded-full bg-amber-600"
+                    style={{ animation: `blink 1.2s step-end ${i * 0.3}s infinite` }}
+                  />
+                ))}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Controls bar */}
+        <div className="flex items-center gap-3 py-3">
           <span className="label-caps shrink-0">Scenario</span>
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
             disabled={running}
-            className="flex-1 max-w-xs bg-ps-surface-2 border border-ps-2 text-ps-text text-xs rounded px-3 py-1.5 focus:outline-none focus:border-gold-dim disabled:opacity-40"
+            className="flex-1 max-w-xs bg-white border border-ps-2 text-slate-700 text-xs rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 disabled:opacity-40"
           >
             {scenarios.length > 0
               ? scenarios.map((s) => <option key={s.path} value={s.path}>{s.label}</option>)
               : <option value="knowledge_base/fiscal/uk_vat_2010.md">UK VAT Rise 2010 (17.5% → 20%)</option>
             }
           </select>
-        </div>
 
-        {/* Live / Replay toggle */}
-        <div className="flex items-center border border-ps rounded overflow-hidden">
-          {(["replay", "live"] as const).map((m) => (
+          <div className="ml-auto flex items-center gap-2">
+            {/* Live / Replay toggle */}
+            <div className="flex items-center border border-ps-2 rounded-md overflow-hidden bg-white">
+              {(["replay", "live"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  disabled={running}
+                  className={[
+                    "px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40",
+                    mode === m
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-50",
+                  ].join(" ")}
+                >
+                  {m === "replay" ? "Replay" : "Live"}
+                </button>
+              ))}
+            </div>
+
+            {/* Run / Stop */}
             <button
-              key={m}
-              onClick={() => setMode(m)}
-              disabled={running}
+              onClick={handleRun}
               className={[
-                "px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40",
-                mode === m
-                  ? "bg-gold-dim text-ps-gold"
-                  : "text-ps-muted hover:text-ps-text hover:bg-ps-surface-2",
+                "px-4 py-1.5 text-xs font-semibold rounded-md border transition-all",
+                running
+                  ? "border-slate-200 text-slate-500 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+                  : "border-amber-600 bg-amber-600 text-white hover:bg-amber-700",
               ].join(" ")}
             >
-              {m === "replay" ? "Replay" : "Live"}
+              {running ? "Stop" : "Run"}
             </button>
-          ))}
+          </div>
         </div>
-
-        {/* Run / Stop */}
-        <button
-          onClick={handleRun}
-          className={[
-            "px-4 py-1.5 text-xs font-semibold rounded border transition-all",
-            running
-              ? "border-ps-2 text-ps-muted bg-ps-surface-2 hover:text-ps-oppose hover:border-ps-oppose"
-              : "border-gold-dim bg-gold-dim text-ps-gold hover:bg-ps-gold hover:text-black",
-          ].join(" ")}
-        >
-          {running ? "Stop" : "Run"}
-        </button>
       </div>
     </header>
   )

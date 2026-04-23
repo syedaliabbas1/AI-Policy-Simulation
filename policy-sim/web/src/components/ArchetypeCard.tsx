@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import type { Briefing, Reaction } from "@/lib/events"
 import type { ArchetypeState } from "@/hooks/useRunStream"
 
-// Static persona metadata — matches data/archetypes/*.json
 const PERSONA_META: Record<string, { name: string; age: number; region: string; role: string; ref: string }> = {
   low_income_worker:    { name: "Sarah",  age: 34, region: "Sunderland",       role: "Part-time carer",        ref: "PS-001" },
   small_business_owner: { name: "Mark",   age: 48, region: "South Yorkshire",  role: "Self-employed builder",  ref: "PS-002" },
@@ -16,33 +15,46 @@ interface Props {
   briefing: Briefing | undefined
 }
 
+function PortraitAvatar({ archetypeId, name }: { archetypeId: string; name: string }) {
+  const [hasImage, setHasImage] = useState(true)
+  return (
+    <div className="w-9 h-9 rounded-full overflow-hidden border border-ps-2 shrink-0 bg-slate-100 flex items-center justify-center">
+      {hasImage ? (
+        <img
+          src={`/portraits/${archetypeId}.png`}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={() => setHasImage(false)}
+        />
+      ) : (
+        <span className="text-xs font-semibold text-slate-500">{name.charAt(0)}</span>
+      )}
+    </div>
+  )
+}
+
 function StanceBar({ value }: { value: number }) {
   const pct = ((value + 1) / 2) * 100
   const isSupport = value > 0.1
   const isOppose = value < -0.1
+  const color = isSupport ? "var(--ps-support)" : isOppose ? "var(--ps-oppose)" : "var(--ps-text-muted)"
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="label-caps text-oppose">Oppose</span>
-        <span
-          className={["text-xs font-semibold tabular-nums", isSupport ? "text-support" : isOppose ? "text-oppose" : "text-ps-muted"].join(" ")}
-        >
+        <span className="label-caps text-red-500">Oppose</span>
+        <span className="text-xs font-semibold tabular-nums" style={{ color }}>
           {value > 0 ? "+" : ""}{value.toFixed(2)}
         </span>
-        <span className="label-caps text-support">Support</span>
+        <span className="label-caps text-green-600">Support</span>
       </div>
       <div className="stance-track">
         <div
-          className="absolute -top-1 w-2.5 h-5 rounded-sm transition-all duration-700 ease-out"
+          className="absolute -top-1.5 w-3 h-6 rounded-sm transition-all duration-700 ease-out"
           style={{
-            left: `calc(${pct}% - 5px)`,
-            background: isSupport ? "var(--ps-support)" : isOppose ? "var(--ps-oppose)" : "var(--ps-text-muted)",
-            boxShadow: isSupport
-              ? "0 0 6px var(--ps-support)"
-              : isOppose
-              ? "0 0 6px var(--ps-oppose)"
-              : "none",
+            left: `calc(${pct}% - 6px)`,
+            background: color,
+            boxShadow: `0 0 4px ${color}40`,
           }}
         />
       </div>
@@ -55,47 +67,29 @@ function ReactionDisplay({ reaction }: { reaction: Reaction }) {
     <div className="space-y-3 animate-in fade-in duration-500">
       <div>
         <span className="label-caps block mb-1">Immediate impact</span>
-        <p className="text-xs text-ps-text leading-relaxed">{reaction.immediate_impact}</p>
+        <p className="text-xs text-slate-700 leading-relaxed">{reaction.immediate_impact}</p>
       </div>
       <div>
         <span className="label-caps block mb-1">Household response</span>
-        <p className="text-xs text-ps-muted leading-relaxed">{reaction.household_response}</p>
+        <p className="text-xs text-slate-500 leading-relaxed">{reaction.household_response}</p>
       </div>
       {reaction.concerns.length > 0 && (
         <div>
           <span className="label-caps block mb-1">Key concerns</span>
           <ul className="space-y-0.5">
             {reaction.concerns.map((c, i) => (
-              <li key={i} className="text-xs text-ps-muted flex gap-1.5">
-                <span className="text-ps-gold mt-0.5 shrink-0">›</span>
+              <li key={i} className="text-xs text-slate-500 flex gap-1.5">
+                <span className="text-amber-600 mt-0.5 shrink-0">›</span>
                 <span>{c}</span>
               </li>
             ))}
           </ul>
         </div>
       )}
-      <div className="pt-1 border-t border-ps">
-        <span className="label-caps block mb-1.5">Verdict</span>
+      <div className="pt-2 border-t border-ps">
+        <span className="label-caps block mb-2">Verdict</span>
         <StanceBar value={reaction.support_or_oppose} />
       </div>
-    </div>
-  )
-}
-
-function PortraitAvatar({ archetypeId, name }: { archetypeId: string; name: string }) {
-  const [hasImage, setHasImage] = useState(true)
-  return (
-    <div className="w-10 h-10 rounded-full overflow-hidden border border-ps-2 shrink-0 bg-ps-surface-2 flex items-center justify-center">
-      {hasImage ? (
-        <img
-          src={`/portraits/${archetypeId}.png`}
-          alt={name}
-          className="w-full h-full object-cover"
-          onError={() => setHasImage(false)}
-        />
-      ) : (
-        <span className="text-xs font-semibold text-ps-muted">{name.charAt(0)}</span>
-      )}
     </div>
   )
 }
@@ -113,66 +107,77 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
   }, [archetypeState?.thinking])
 
   const stanceValue = archetypeState?.reaction?.support_or_oppose ?? null
+  const isSupport = stanceValue !== null && stanceValue > 0.1
+  const isOppose  = stanceValue !== null && stanceValue < -0.1
 
   const leftBorderColor =
-    stanceValue === null ? "var(--ps-border)"
-    : stanceValue > 0.1  ? "var(--ps-support)"
-    : stanceValue < -0.1 ? "var(--ps-oppose)"
-    : "var(--ps-text-muted)"
+    stanceValue === null ? "#e2e8f0"
+    : isSupport          ? "var(--ps-support)"
+    : isOppose           ? "var(--ps-oppose)"
+    : "#94a3b8"
 
   return (
     <div
-      className="flex flex-col bg-ps-surface border border-ps rounded overflow-hidden card-glow"
-      style={{ borderLeft: `3px solid ${leftBorderColor}`, transition: "border-left-color 0.6s ease" }}
+      className="flex flex-col bg-white rounded-lg overflow-hidden card-glow"
+      style={{
+        borderLeft: `3px solid ${leftBorderColor}`,
+        border: "1px solid var(--ps-border)",
+        borderLeftWidth: "3px",
+        borderLeftColor: leftBorderColor,
+        transition: "border-left-color 0.6s ease",
+        boxShadow: "var(--ps-shadow)",
+      }}
     >
       {/* Card header */}
-      <div className="flex items-start justify-between px-4 py-3 border-b border-ps bg-ps-surface-2">
+      <div className="flex items-start justify-between px-4 py-3 border-b border-ps bg-slate-50">
         <div className="flex items-center gap-3">
           <PortraitAvatar archetypeId={archetypeId} name={meta.name} />
           <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-ps-heading tracking-tight">{meta.name}</span>
-              <span className="text-xs text-ps-muted">{meta.age}</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm font-semibold text-slate-900">{meta.name}</span>
+              <span className="text-xs text-slate-400">{meta.age}</span>
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex items-center gap-1.5 mt-0.5">
               <span className="label-caps">{meta.region}</span>
-              <span className="text-ps-faint">·</span>
+              <span className="text-slate-300">·</span>
               <span className="label-caps">{meta.role}</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className="label-caps text-ps-faint">{meta.ref}</span>
+          <span className="label-caps text-slate-300">{meta.ref}</span>
           {archetypeState?.complete && (
-            <span className="label-caps text-ps-support">Complete</span>
+            <span className="text-xs font-medium text-green-600">Complete</span>
           )}
           {isThinking && (
-            <span className="label-caps text-terminal animate-pulse">Reasoning</span>
+            <span className="text-xs font-medium text-emerald-600 animate-pulse">Reasoning</span>
           )}
         </div>
       </div>
 
       {/* Briefing headline */}
       {briefing && (
-        <div className="px-4 py-2 border-b border-ps bg-gold-dim">
+        <div className="px-4 py-2 border-b border-ps bg-amber-50">
           <span className="label-caps-gold block mb-0.5">Briefing</span>
-          <p className="text-xs text-ps-text leading-snug">{briefing.headline}</p>
+          <p className="text-xs text-slate-700 leading-snug">{briefing.headline}</p>
         </div>
       )}
 
       {/* Content area */}
-      <div className="flex-1 px-4 py-3 overflow-hidden relative">
+      <div className="flex-1 px-4 py-3 overflow-hidden">
         {!archetypeState ? (
-          <p className="text-xs text-ps-faint italic">Awaiting briefing…</p>
+          <p className="text-xs text-slate-400 italic">Awaiting briefing…</p>
         ) : hasReaction ? (
           <ReactionDisplay reaction={archetypeState.reaction!} />
         ) : (
-          /* Thinking phase — terminal overlay */
+          /* Thinking phase — deliberate dark terminal block */
           <div className="relative">
-            <div className="bg-terminal-dim rounded px-3 py-2 mb-2">
+            <div className="rounded-md px-3 py-2 mb-2" style={{ background: "var(--ps-terminal-bg)" }}>
               <div className="flex items-center gap-2 mb-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-terminal animate-pulse" />
-                <span className="label-caps text-terminal">Extended Thinking</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500" style={{ fontSize: "0.6rem" }}>
+                  Extended Thinking
+                </span>
               </div>
               <div
                 ref={thinkingRef}
@@ -186,7 +191,7 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
             {archetypeState.reactionTokens && (
               <div className="mt-2">
                 <span className="label-caps block mb-1">Forming reaction…</span>
-                <p className="text-xs text-ps-muted font-mono-ps opacity-70" style={{ fontSize: "0.65rem" }}>
+                <p className="text-slate-400 font-mono" style={{ fontSize: "0.65rem", lineHeight: 1.5 }}>
                   {archetypeState.reactionTokens.slice(-200)}
                 </p>
               </div>

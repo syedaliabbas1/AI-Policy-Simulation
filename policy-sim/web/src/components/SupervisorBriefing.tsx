@@ -32,38 +32,38 @@ export function SupervisorBriefing({ phase, text, briefings }: Props) {
   return (
     <div
       className="border-b border-ps overflow-hidden transition-all duration-500"
-      style={{ maxHeight: collapsed ? "36px" : "140px", background: "var(--ps-surface)" }}
+      style={{ maxHeight: collapsed ? "38px" : "140px", background: "#fffbeb" }}
     >
       {collapsed ? (
         <button
           onClick={() => setCollapsed(false)}
-          className="w-full flex items-center gap-3 px-6 py-2 hover:bg-ps-surface-2 transition-colors"
+          className="w-full flex items-center gap-3 px-6 py-2.5 hover:bg-amber-50 transition-colors"
         >
           <span className="label-caps-gold">Supervisor</span>
-          <span className="text-xs text-ps-muted">
+          <span className="text-xs text-slate-500">
             {briefingCount} archetype briefings generated
           </span>
-          <span className="ml-auto label-caps text-ps-faint">expand ↓</span>
+          <span className="ml-auto text-xs text-slate-400">expand ↓</span>
         </button>
       ) : (
         <div className="px-6 py-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="label-caps-gold">Supervisor</span>
+            <span className="label-caps-gold">Supervisor Analysis</span>
             {streaming && (
-              <span className="label-caps text-terminal animate-pulse">Streaming</span>
+              <span className="text-xs text-amber-600 font-medium animate-pulse">Streaming</span>
             )}
             {briefingCount > 0 && (
-              <span className="label-caps text-ps-support ml-auto">
+              <span className="text-xs text-green-600 font-medium ml-auto">
                 {briefingCount}/4 briefings ready
               </span>
             )}
           </div>
           <div
             ref={textRef}
-            className="text-xs text-ps-muted overflow-y-auto leading-relaxed"
+            className="overflow-y-auto leading-relaxed text-slate-600"
             style={{ maxHeight: "80px", fontFamily: "var(--font-mono)", fontSize: "0.68rem" }}
           >
-            {text || <span className="text-ps-faint italic">Awaiting supervisor…</span>}
+            {text || <span className="text-slate-400 italic">Awaiting supervisor…</span>}
             {streaming && <span className="cursor-blink" />}
           </div>
         </div>
