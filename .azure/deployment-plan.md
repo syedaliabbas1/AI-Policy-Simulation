@@ -1,6 +1,6 @@
 # Azure Deployment Plan — Policy Simulation Backend
 
-**Status:** Awaiting Approval
+**Status:** Deployed and Verified
 **Created:** 2026-04-23
 **Subscription:** Azure for Students (3aa1775b-6510-4f86-aa4d-6d3e337157b5)
 **az CLI path:** `C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd`
@@ -41,14 +41,15 @@ MODIFY — existing codebase, all deploy config in place.
 
 ## Execution Steps
 
-- [ ] 1. Create resource group `policy-sim-rg` in West Europe
-- [ ] 2. Create App Service Plan `policy-sim-plan` (B1 Linux)
-- [ ] 3. Create Web App `policy-sim` (Python 3.11)
-- [ ] 4. Set startup command: `bash startup.sh`
-- [ ] 5. Set `Always On = true` and all environment variables
-- [ ] 6. Zip-deploy `policy-sim/` directory
-- [ ] 7. Smoke test `GET /api/health` → 200
-- [ ] 8. SSE buffering test via `curl -N https://policy-sim.azurewebsites.net/api/smoke` — expect 20 ticks at ~500ms
+- [x] 1. Create resource group `policy-sim-rg` in austriaeast (West Europe restricted by policy)
+- [x] 2. Create App Service Plan `policy-sim-plan` (B1 Linux)
+- [x] 3. Create Web App `policy-sim` (Python 3.11)
+- [x] 4. Set startup command: `gunicorn api.main:app --worker-class uvicorn.workers.UvicornWorker ...`
+- [x] 5. Set Always On and all environment variables
+- [x] 6. Zip-deploy `policy-sim/` (git archive HEAD:policy-sim)
+- [x] 7. Health check `GET /api/health` → 200 ✓
+- [x] 8. SSE buffering test → ticks at ~500ms intervals ✓ (pass)
+- [x] 9. Scenarios endpoint → 3 scenarios ✓
 
 ## Pre-deploy Changes Made
 
