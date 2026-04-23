@@ -4,7 +4,7 @@ import os
 from fastapi import Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
-_BYPASS_PATHS = {"/api/health", "/api/debug/boom", "/api/smoke"}
+_BYPASS_PATHS = {"/api/health", "/api/debug/boom", "/api/smoke", "/api/scenarios"}
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):

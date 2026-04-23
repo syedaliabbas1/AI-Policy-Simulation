@@ -1,5 +1,6 @@
 """FastAPI application — SSE-backed policy simulation API."""
 
+import asyncio
 import os
 from pathlib import Path
 
@@ -59,6 +60,16 @@ _engine = SimulationEngine(runs_root=_RUNS_ROOT)
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/api/smoke")
+async def smoke():
+    """SSE buffering test — emits 20 ticks at 500ms intervals. Used to verify Vercel → Azure streaming works."""
+    async def _ticks():
+        for n in range(20):
+            yield {"data": f"tick {n}"}
+            await asyncio.sleep(0.5)
+    return EventSourceResponse(_ticks())
 
 
 @app.get("/api/debug/boom")
