@@ -1,107 +1,88 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-/* EB Garamond loaded via <link> in index.html to avoid PostCSS @import ordering constraint */
 
-@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ── Policy-Sim Design System — Light (Tremor-inspired) ─── */
+/* ── Policy-Sim Design System ────────────────────────── */
 :root {
-  /* Backgrounds */
+  /* Custom palette */
   --ps-bg:          #f8fafc;
   --ps-surface:     #ffffff;
-  --ps-surface-2:   #f1f5f9;
-
-  /* Borders */
+  --ps-surface-2:  #f1f5f9;
   --ps-border:      #e2e8f0;
   --ps-border-2:    #cbd5e1;
-
-  /* Typography */
   --ps-text:        #1e293b;
   --ps-text-muted:  #64748b;
   --ps-text-faint:  #94a3b8;
-  --ps-heading:     #0f172a;
-
-  /* Accent — government gold (kept as brand identity) */
+  --ps-heading:      #0f172a;
   --ps-gold:        #b45309;
-  --ps-gold-dim:    rgba(180, 83, 9, 0.07);
-  --ps-gold-border: rgba(180, 83, 9, 0.2);
-
-  /* Terminal / AI thinking — intentionally dark block on light page */
+  --ps-gold-dim:     rgba(180,83,9,0.07);
+  --ps-gold-border:  rgba(180,83,9,0.2);
   --ps-terminal:    #22c55e;
   --ps-terminal-bg: #0f172a;
-
-  /* Stance */
   --ps-support:     #16a34a;
   --ps-oppose:      #dc2626;
+  --font-ui:        'Geist Variable', sans-serif;
+  --font-document:  'EB Garamond', Georgia, serif;
+  --font-mono:      'GeistMono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
 
-  /* Fonts */
-  --font-ui:       'Geist Variable', sans-serif;
-  --font-document: 'EB Garamond', Georgia, serif;
-  --font-mono:     'GeistMono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  /* shadcn design tokens */
+  --background:  oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card:       oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover:        oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary:    oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary:  oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted:      oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent:     oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border:     oklch(0.922 0 0);
+  --input:      oklch(0.922 0 0);
+  --ring:       oklch(0.708 0 0);
+  --radius:     0.375rem;
 
-  /* Shadows (Tremor-style) */
-  --ps-shadow:      0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-  --ps-shadow-card: 0 0 0 1px var(--ps-border), 0 1px 3px rgba(0,0,0,0.06);
-
-  /* shadcn overrides — light */
-  --background:     var(--ps-bg);
-  --foreground:     var(--ps-heading);
-  --card:           var(--ps-surface);
-  --card-foreground: var(--ps-text);
-  --border:         var(--ps-border);
-  --input:          var(--ps-border-2);
-  --ring:           var(--ps-gold-border);
-  --primary:        var(--ps-gold);
-  --primary-foreground: #ffffff;
-  --secondary:      var(--ps-surface-2);
-  --secondary-foreground: var(--ps-text);
-  --muted:          var(--ps-surface-2);
-  --muted-foreground: var(--ps-text-muted);
-  --accent:         var(--ps-gold-dim);
-  --accent-foreground: var(--ps-gold);
-  --destructive:    oklch(0.577 0.245 27.325);
-  --radius:         0.375rem;
+  /* Chart colors */
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
 }
 
-@theme inline {
-  --font-sans: var(--font-ui);
-  --font-heading: var(--font-document);
-  --font-mono: var(--font-mono);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) * 1.5);
-  --radius-xl: calc(var(--radius) * 2);
-  --color-ps-gold: var(--ps-gold);
-  --color-ps-terminal: var(--ps-terminal);
-  --color-ps-support: var(--ps-support);
-  --color-ps-oppose: var(--ps-oppose);
-  --color-ps-surface: var(--ps-surface);
-  --color-ps-surface-2: var(--ps-surface-2);
-  --color-ps-border: var(--ps-border);
-  --color-ps-text: var(--ps-text);
-  --color-ps-muted: var(--ps-text-muted);
-  --color-ps-bg: var(--ps-bg);
+.dark {
+  --background:  oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card:       oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover:        oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary:    oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary:  oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted:      oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent:     oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border:     oklch(1 0 0 / 10%);
+  --input:      oklch(1 0 0 / 15%);
+  --ring:       oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
 }
 
-/* ── Base reset ───────────────────────────────────────── */
+/* ── Base reset ──────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -126,7 +107,7 @@
   }
 }
 
-/* ── Utility classes ──────────────────────────────────── */
+/* ── Utility classes ─────────────────────────────────── */
 @layer utilities {
   .font-document { font-family: var(--font-document); }
   .font-mono-ps  { font-family: var(--font-mono); }
@@ -165,7 +146,6 @@
     color: var(--ps-gold);
   }
 
-  /* Blinking cursor for streaming text */
   .cursor-blink::after {
     content: '▋';
     display: inline-block;
@@ -179,7 +159,6 @@
     50%       { opacity: 0; }
   }
 
-  /* Thinking text — dark terminal card on light page */
   .thinking-stream {
     font-family: var(--font-mono);
     font-size: 0.7rem;
@@ -189,7 +168,6 @@
     word-break: break-word;
   }
 
-  /* Card hover */
   .card-glow {
     transition: box-shadow 0.15s ease;
   }
@@ -197,7 +175,6 @@
     box-shadow: 0 0 0 1px var(--ps-gold-border), 0 4px 12px rgba(0,0,0,0.08);
   }
 
-  /* Stance gradient bar */
   .stance-track {
     height: 3px;
     background: linear-gradient(90deg, var(--ps-oppose) 0%, #cbd5e1 50%, var(--ps-support) 100%);

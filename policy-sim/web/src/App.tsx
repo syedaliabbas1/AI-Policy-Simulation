@@ -4,6 +4,7 @@ import { SupervisorBriefing } from "@/components/SupervisorBriefing"
 import { ArchetypeCard } from "@/components/ArchetypeCard"
 import { BriefDisplay } from "@/components/BriefDisplay"
 import { ValidationPanel } from "@/components/ValidationPanel"
+import { Card, Metric, Text } from "@tremor/react"
 import type { ArchetypeState } from "@/hooks/useRunStream"
 
 const ARCHETYPE_ORDER = [
@@ -23,21 +24,16 @@ const ARCHETYPE_NAMES: Record<string, string> = {
 function KPICard({ archetypeId, state }: { archetypeId: string; state: ArchetypeState | undefined }) {
   const name = ARCHETYPE_NAMES[archetypeId] ?? archetypeId
   const stance = state?.reaction?.support_or_oppose ?? null
-  const isSupport = stance !== null && stance > 0.1
-  const isOppose  = stance !== null && stance < -0.1
-  const color     = isSupport ? "#15803d" : isOppose ? "#b91c1c" : "#64748b"
-  const bg        = isSupport ? "#f0fdf4" : isOppose ? "#fef2f2" : "#f8fafc"
-  const border    = isSupport ? "#bbf7d0" : isOppose ? "#fecaca" : "#e2e8f0"
-  const label     = isSupport ? "Support" : isOppose ? "Oppose" : stance !== null ? "Neutral" : "Pending"
 
   return (
-    <div className="flex-1 rounded-lg p-4 border" style={{ background: bg, borderColor: border }}>
-      <p className="text-xs font-medium text-slate-500 mb-1">{name}</p>
-      <p className="text-xl font-semibold tabular-nums" style={{ color }}>
+    <Card className="p-4">
+      <Text className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        {name}
+      </Text>
+      <Metric className="tabular-nums text-xl">
         {stance !== null ? (stance > 0 ? "+" : "") + stance.toFixed(2) : "—"}
-      </p>
-      <p className="text-xs mt-1 font-medium" style={{ color }}>{label}</p>
-    </div>
+      </Metric>
+    </Card>
   )
 }
 

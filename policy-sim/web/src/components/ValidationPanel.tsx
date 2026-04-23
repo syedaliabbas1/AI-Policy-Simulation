@@ -1,25 +1,8 @@
 import type { ValidationResult } from "@/lib/events"
+import { BadgeDelta } from "@tremor/react"
 
 interface Props {
   validation: ValidationResult | null
-}
-
-function Badge({ pass, label }: { pass: boolean; label: string }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-      style={{
-        background: pass ? "#f0fdf4" : "#fef2f2",
-        color:      pass ? "#15803d" : "#b91c1c",
-        border:     `1px solid ${pass ? "#bbf7d0" : "#fecaca"}`,
-      }}
-    >
-      <span className="text-base leading-none" style={{ fontSize: "0.65rem" }}>{pass ? "✓" : "✗"}</span>
-      <span className="uppercase tracking-wide" style={{ letterSpacing: "0.07em", fontSize: "0.6rem" }}>
-        {label}
-      </span>
-    </span>
-  )
 }
 
 export function ValidationPanel({ validation }: Props) {
@@ -42,16 +25,31 @@ export function ValidationPanel({ validation }: Props) {
         </div>
 
         {hasError ? (
-          <p className="text-xs text-red-600">{validation.error as string}</p>
+          <div className="bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 text-xs text-rose-700">
+            <strong className="font-semibold">Error: </strong>{validation.error as string}
+          </div>
         ) : (
           <div className="space-y-5">
             {dir && (
               <div className="bg-slate-50 rounded-lg p-4 border border-ps">
                 <span className="label-caps block mb-3">Directional alignment — archetype vs IFS findings</span>
                 <div className="flex flex-wrap gap-2">
-                  <Badge pass={allDirectional} label="Overall directional" />
+                  <BadgeDelta
+                    isIncreasePositive={allDirectional}
+                    deltaType={allDirectional ? "increase" : "decrease"}
+                    size="sm"
+                  >
+                    Overall
+                  </BadgeDelta>
                   {Object.entries(dir).map(([id, result]) => (
-                    <Badge key={id} pass={result.pass} label={id.replace(/_/g, " ")} />
+                    <BadgeDelta
+                      key={id}
+                      isIncreasePositive={result.pass}
+                      deltaType={result.pass ? "increase" : "decrease"}
+                      size="sm"
+                    >
+                      {id.replace(/_/g, " ")}
+                    </BadgeDelta>
                   ))}
                 </div>
               </div>
@@ -62,7 +60,14 @@ export function ValidationPanel({ validation }: Props) {
                 <span className="label-caps block mb-3">Internal consistency checks</span>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(ic).map(([check, pass]) => (
-                    <Badge key={check} pass={pass} label={check.replace(/_/g, " ")} />
+                    <BadgeDelta
+                      key={check}
+                      isIncreasePositive={pass}
+                      deltaType={pass ? "increase" : "decrease"}
+                      size="sm"
+                    >
+                      {check.replace(/_/g, " ")}
+                    </BadgeDelta>
                   ))}
                 </div>
               </div>

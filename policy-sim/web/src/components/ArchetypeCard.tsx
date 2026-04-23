@@ -62,7 +62,7 @@ function StanceBar({ value }: { value: number }) {
         </span>
         <span className="label-caps text-green-600">Support</span>
       </div>
-      <div className="stance-track">
+      <div className="relative stance-track">
         <div
           className="absolute -top-1.5 w-3 h-6 rounded-sm transition-all duration-700 ease-out"
           style={{

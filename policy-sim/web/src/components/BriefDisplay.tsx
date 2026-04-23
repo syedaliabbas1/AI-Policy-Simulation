@@ -1,5 +1,5 @@
 import ReactMarkdown from "react-markdown"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ReferenceLine, ResponsiveContainer, Cell, Tooltip } from "recharts"
+import { BarList } from "@tremor/react"
 import type { Phase } from "@/hooks/useRunStream"
 import type { Reaction } from "@/lib/events"
 
@@ -28,54 +28,14 @@ function StanceChart({ archetypes }: { archetypes: Props["archetypes"] }) {
 
   if (data.length === 0) return null
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: { name: string; value: number } }[] }) => {
-    if (!active || !payload?.length) return null
-    const { name, value } = payload[0].payload
-    const label = value > 0.1 ? "Support" : value < -0.1 ? "Oppose" : "Neutral"
-    const color = value > 0.1 ? "#15803d" : value < -0.1 ? "#b91c1c" : "#64748b"
-    return (
-      <div className="bg-white border border-ps rounded-md px-3 py-2 shadow-md text-xs">
-        <p className="font-semibold text-slate-900">{name}</p>
-        <p style={{ color }}>{label}: {value > 0 ? "+" : ""}{value.toFixed(2)}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="mb-6 bg-slate-50 rounded-lg border border-ps p-4">
       <span className="label-caps-gold block mb-4">Distributional Stance</span>
-      <ResponsiveContainer width="100%" height={data.length * 52 + 20}>
-        <BarChart data={data} layout="vertical" margin={{ left: 8, right: 32, top: 0, bottom: 0 }}>
-          <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis
-            type="number"
-            domain={[-1, 1]}
-            ticks={[-1, -0.5, 0, 0.5, 1]}
-            tickFormatter={(v) => v > 0 ? `+${v}` : `${v}`}
-            tick={{ fontSize: 10, fill: "#94a3b8" }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            type="category"
-            dataKey="name"
-            width={42}
-            tick={{ fontSize: 12, fontWeight: 500, fill: "#475569" }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <ReferenceLine x={0} stroke="#cbd5e1" strokeWidth={1.5} />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)" }} />
-          <Bar dataKey="value" radius={[0, 3, 3, 0]} maxBarSize={22}>
-            {data.map((entry, i) => (
-              <Cell
-                key={i}
-                fill={entry.value > 0.1 ? "#16a34a" : entry.value < -0.1 ? "#dc2626" : "#94a3b8"}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      <BarList
+        data={data}
+        valueFormatter={(v: number) => v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2)}
+        color="slate"
+      />
       <div className="flex justify-between mt-2 px-1">
         <span className="label-caps text-red-500">Oppose</span>
         <span className="label-caps text-slate-400">Neutral</span>
