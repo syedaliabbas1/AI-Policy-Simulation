@@ -132,10 +132,8 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
 
   return (
     <div
-      className="flex flex-col bg-white rounded-lg overflow-hidden card-glow"
+      className="flex flex-col bg-white rounded-lg overflow-hidden card-glow border border-ps"
       style={{
-        borderLeft: `3px solid ${leftBorderColor}`,
-        border: "1px solid var(--ps-border)",
         borderLeftWidth: "3px",
         borderLeftColor: leftBorderColor,
         transition: "border-left-color 0.6s ease",
@@ -187,32 +185,32 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
             {archetypeState.audioUrl && <AudioPlayer url={archetypeState.audioUrl} />}
           </>
         ) : (
-          /* Thinking phase — deliberate dark terminal block */
-          <div className="relative">
-            <div className="rounded-md px-3 py-2 mb-2" style={{ background: "var(--ps-terminal-bg)" }}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500" style={{ fontSize: "0.6rem" }}>
-                  Extended Thinking
-                </span>
-              </div>
-              <div
-                ref={thinkingRef}
-                className="thinking-stream overflow-y-auto"
-                style={{ maxHeight: "160px" }}
-              >
-                {archetypeState.thinking || "Initialising…"}
-                {isThinking && <span className="cursor-blink" />}
-              </div>
+          /* Reasoning phase — dark terminal block */
+          <div className="rounded-md px-3 py-2" style={{ background: "var(--ps-terminal-bg)" }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500" style={{ fontSize: "0.6rem" }}>
+                {archetypeState.thinking ? "Extended Thinking" : "Reasoning"}
+              </span>
             </div>
-            {archetypeState.reactionTokens && (
-              <div className="mt-2">
-                <span className="label-caps block mb-1">Forming reaction…</span>
-                <p className="text-slate-400 font-mono" style={{ fontSize: "0.65rem", lineHeight: 1.5 }}>
-                  {archetypeState.reactionTokens.slice(-200)}
-                </p>
-              </div>
-            )}
+            <div
+              ref={thinkingRef}
+              className="thinking-stream overflow-y-auto"
+              style={{ maxHeight: "200px" }}
+            >
+              {archetypeState.thinking
+                ? <>
+                    {archetypeState.thinking}
+                    {isThinking && <span className="cursor-blink" />}
+                  </>
+                : archetypeState.reactionTokens
+                  ? <>
+                      {archetypeState.reactionTokens}
+                      <span className="cursor-blink" />
+                    </>
+                  : <>Initialising…<span className="cursor-blink" /></>
+              }
+            </div>
           </div>
         )}
       </div>

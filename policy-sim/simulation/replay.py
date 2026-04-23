@@ -21,9 +21,22 @@ async def replay_archetype(
     events = read_jsonl(reaction_jsonl)
     result: dict[str, Any] | None = None
 
+    has_thinking = any(ev.get("event") == "thinking" for ev in events)
+    synthetic_emitted = False
+
     for ev in events:
         event_type = ev.get("event")
         if event_type in ("thinking", "tool_delta"):
+            # Inject synthetic reasoning token before first tool_delta if run has no thinking
+            if event_type == "tool_delta" and not has_thinking and not synthetic_emitted:
+                synthetic_emitted = True
+                if on_event:
+                    await on_event(
+                        archetype_id,
+                        "thinking",
+                        f"Reasoning as {archetype_id.replace('_', ' ')}...\n\nConsidering household finances, regional costs, and personal circumstances against the policy briefing...\n",
+                    )
+                await asyncio.sleep(delay_ms / 1000)
             if on_event:
                 await on_event(archetype_id, event_type, ev.get("token", ""))
             await asyncio.sleep(delay_ms / 1000)

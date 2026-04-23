@@ -123,7 +123,7 @@ async def stream_archetype(
     reaction_delta tokens.
     """
     tool_parts: list[str] = []
-    thinking_block_emitted = False
+    thinking_emitted = False
 
     async with client.beta.messages.stream(
         model=MODEL,
@@ -150,11 +150,10 @@ async def stream_archetype(
         ],
     ) as stream:
         async for event in stream:
-            # Detect start of thinking block — emit a synthetic token so the UI knows
             if event.type == "content_block_start":
                 block_type = getattr(event.content_block, "type", "")
-                if block_type in ("thinking", "redacted_thinking") and not thinking_block_emitted:
-                    thinking_block_emitted = True
+                if block_type in ("thinking", "redacted_thinking") and not thinking_emitted:
+                    thinking_emitted = True
                     if on_event:
                         await on_event(
                             "thinking",
@@ -166,10 +165,18 @@ async def stream_archetype(
                 continue
             delta = event.delta
             if delta.type == "thinking_delta":
-                # Visible thinking text (may appear on some models/configurations)
                 if on_event:
                     await on_event("thinking", delta.thinking)
             elif delta.type == "input_json_delta":
+                # Emit synthetic reasoning placeholder on the very first tool token
+                # so the UI always shows streaming content even when adaptive thinking
+                # decides not to generate a thinking block.
+                if not thinking_emitted and on_event:
+                    thinking_emitted = True
+                    await on_event(
+                        "thinking",
+                        f"Reasoning as {persona.get('display_name', persona.get('id', 'archetype'))}...\n\nConsidering household finances, regional costs, and personal circumstances against the policy briefing...\n",
+                    )
                 tool_parts.append(delta.partial_json)
                 if on_event:
                     await on_event("tool_delta", delta.partial_json)
