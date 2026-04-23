@@ -1,0 +1,15 @@
+api/
+simulation/
+app/
+data/
+knowledge_base/
+scripts/
+docs/
+*.py
+requirements.txt
+startup.sh
+.env*
+.venv/
+__pycache__/
+*.pyc
+simulation_runs/
