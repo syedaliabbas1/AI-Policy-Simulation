@@ -2,6 +2,7 @@ import ReactMarkdown from "react-markdown"
 import { BarList } from "@tremor/react"
 import type { Phase } from "@/hooks/useRunStream"
 import type { Reaction } from "@/lib/events"
+import { Card } from "./tremor/Card"
 
 interface Props {
   phase: Phase
@@ -29,19 +30,22 @@ function StanceChart({ archetypes }: { archetypes: Props["archetypes"] }) {
   if (data.length === 0) return null
 
   return (
-    <div className="mb-6 bg-slate-50 rounded-lg border border-ps p-4">
-      <span className="label-caps-gold block mb-4">Distributional Stance</span>
+    <Card className="mb-6 p-4">
+      <p className="text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-4">
+        Distributional Stance
+      </p>
       <BarList
         data={data}
         valueFormatter={(v: number) => v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2)}
-        color="slate"
+        color="blue"
+        className="max-h-48"
       />
-      <div className="flex justify-between mt-2 px-1">
-        <span className="label-caps text-red-500">Oppose</span>
-        <span className="label-caps text-slate-400">Neutral</span>
-        <span className="label-caps text-green-600">Support</span>
+      <div className="flex justify-between mt-3 px-1">
+        <span className="text-xs font-medium text-red-500">Oppose</span>
+        <span className="text-xs text-gray-400">Neutral</span>
+        <span className="text-xs font-medium text-emerald-500">Support</span>
       </div>
-    </div>
+    </Card>
   )
 }
 
@@ -50,18 +54,20 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
   const isStreaming = phase === "reporting"
 
   return (
-    <section className="border-t border-ps bg-white">
+    <section className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#090E1A]">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 rounded-full bg-amber-600" />
+          <div className="w-1 h-6 rounded-full bg-blue-500" />
           <div className="flex-1">
-            <h2 className="text-sm font-semibold text-slate-900">Policy Analysis Brief</h2>
-            <span className="text-xs text-slate-400">{isStreaming ? "Generating…" : "Completed"}</span>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Policy Analysis Brief</h2>
+            <span className="text-xs text-gray-500 dark:text-gray-500">
+              {isStreaming ? "Generating…" : "Completed"}
+            </span>
           </div>
-          {isStreaming && <span className="cursor-blink text-amber-600 ml-1" />}
+          {isStreaming && <span className="cursor-blink text-blue-500 ml-1">▋</span>}
           {briefAudioUrl && (
             <div className="flex items-center gap-2">
-              <span className="label-caps">Narration</span>
+              <span className="text-xs text-gray-500">Narration</span>
               <audio controls src={briefAudioUrl} className="h-8" style={{ width: "200px", colorScheme: "light" }} />
             </div>
           )}
@@ -70,7 +76,7 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
         <StanceChart archetypes={archetypes} />
 
         {markdown && (
-          <div style={{ fontFamily: "var(--font-document)", fontSize: "1rem", lineHeight: "1.75", color: "var(--ps-text)" }}>
+          <div className="font-sans text-gray-900 dark:text-gray-50">
             <ReactMarkdown
               components={{
                 h1: ({ children }) => (
@@ -106,7 +112,7 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
             >
               {markdown}
             </ReactMarkdown>
-            {isStreaming && <span className="cursor-blink" />}
+            {isStreaming && <span className="cursor-blink text-blue-500">▋</span>}
           </div>
         )}
       </div>

@@ -1,5 +1,7 @@
 import type { ValidationResult } from "@/lib/events"
-import { BadgeDelta } from "@tremor/react"
+import { Badge } from "./tremor/Badge"
+import { Callout } from "./tremor/Callout"
+import { Divider } from "./tremor/Divider"
 
 interface Props {
   validation: ValidationResult | null
@@ -14,66 +16,60 @@ export function ValidationPanel({ validation }: Props) {
   const hasError = !!validation.error
 
   return (
-    <section className="border-t border-ps bg-white">
+    <section className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#090E1A]">
       <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-5 rounded-full bg-amber-600" />
+          <div className="w-1 h-5 rounded-full bg-blue-500" />
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">IFS Validation</h3>
-            <p className="text-xs text-slate-400 mt-0.5">2011 Distributional Study — Directional Comparison</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-50">IFS Validation</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">2011 Distributional Study — Directional Comparison</p>
           </div>
         </div>
 
         {hasError ? (
-          <div className="bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 text-xs text-rose-700">
-            <strong className="font-semibold">Error: </strong>{validation.error as string}
-          </div>
+          <Callout title="Validation Error" variant="error">
+            {validation.error as string}
+          </Callout>
         ) : (
           <div className="space-y-5">
             {dir && (
-              <div className="bg-slate-50 rounded-lg p-4 border border-ps">
-                <span className="label-caps block mb-3">Directional alignment — archetype vs IFS findings</span>
+              <div className="rounded-md p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                <span className="block mb-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">
+                  Directional alignment — archetype vs IFS findings
+                </span>
                 <div className="flex flex-wrap gap-2">
-                  <BadgeDelta
-                    isIncreasePositive={allDirectional}
-                    deltaType={allDirectional ? "increase" : "decrease"}
-                    size="sm"
-                  >
-                    Overall
-                  </BadgeDelta>
+                  <Badge variant={allDirectional ? "success" : "error"}>
+                    Overall {allDirectional ? "Aligned" : "Misaligned"}
+                  </Badge>
                   {Object.entries(dir).map(([id, result]) => (
-                    <BadgeDelta
-                      key={id}
-                      isIncreasePositive={result.pass}
-                      deltaType={result.pass ? "increase" : "decrease"}
-                      size="sm"
-                    >
-                      {id.replace(/_/g, " ")}
-                    </BadgeDelta>
+                    <Badge key={id} variant={result.pass ? "success" : "error"}>
+                      {id.replace(/_/g, " ")} {result.pass ? "✓" : "✗"}
+                    </Badge>
                   ))}
                 </div>
               </div>
             )}
 
             {ic && (
-              <div className="bg-slate-50 rounded-lg p-4 border border-ps">
-                <span className="label-caps block mb-3">Internal consistency checks</span>
+              <div className="rounded-md p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                <span className="block mb-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide">
+                  Internal consistency checks
+                </span>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(ic).map(([check, pass]) => (
-                    <BadgeDelta
-                      key={check}
-                      isIncreasePositive={pass}
-                      deltaType={pass ? "increase" : "decrease"}
-                      size="sm"
-                    >
-                      {check.replace(/_/g, " ")}
-                    </BadgeDelta>
+                    <Badge key={check} variant={pass ? "success" : "error"}>
+                      {check.replace(/_/g, " ")} {pass ? "✓" : "✗"}
+                    </Badge>
                   ))}
                 </div>
               </div>
             )}
 
-            <p className="text-xs text-slate-400 leading-relaxed pt-2 border-t border-ps">
+            <Divider>
+              <span className="text-xs text-gray-400 dark:text-gray-600">Note</span>
+            </Divider>
+
+            <p className="text-xs text-gray-400 dark:text-gray-600 leading-relaxed">
               Pattern-oriented validation only. Archetype predictions are compared directionally against IFS 2011
               aggregate distributional findings — not against individual ground truth. Simulation output
               represents modelled reasoning, not primary polling data.
