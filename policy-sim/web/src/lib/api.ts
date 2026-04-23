@@ -39,3 +39,11 @@ export async function createRun(scenarioPath: string): Promise<{ run_id: string 
 export async function getBrief(runId: string): Promise<{ markdown: string }> {
   return apiFetch<{ markdown: string }>(`/api/runs/${runId}/brief`)
 }
+
+// For resources loaded via browser tags (audio, img) that can't set custom headers —
+// append the key as a query param so the auth middleware accepts it.
+export function authUrl(path: string): string {
+  if (!API_KEY) return path
+  const sep = path.includes("?") ? "&" : "?"
+  return `${path}${sep}key=${encodeURIComponent(API_KEY)}`
+}

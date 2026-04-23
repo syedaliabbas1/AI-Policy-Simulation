@@ -1,7 +1,7 @@
 import { useCallback, useReducer, useRef } from "react"
 import type { Briefing, Reaction, ValidationResult } from "@/lib/events"
 import { streamRun } from "@/lib/sseClient"
-import { createRun } from "@/lib/api"
+import { createRun, authUrl } from "@/lib/api"
 
 export type Phase = "idle" | "supervisor" | "reacting" | "reporting" | "done" | "error"
 
@@ -157,7 +157,7 @@ export function useRunStream() {
             dispatch({ type: "REACTION_COMPLETE", archetypeId: event.archetype_id, reaction: event.reaction })
             break
           case "audio_ready": {
-            const audioUrl = `/api/runs/${runId}/audio/${event.filename}`
+            const audioUrl = authUrl(`/api/runs/${runId}/audio/${event.filename}`)
             dispatch({ type: "AUDIO_READY", archetypeId: event.archetype_id, audioUrl })
             break
           }
