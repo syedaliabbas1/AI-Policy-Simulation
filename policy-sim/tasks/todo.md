@@ -1,95 +1,89 @@
-# policy-sim — Frontend + API Task List
+# policy-sim — Task Status
 
-**Session start:** 2026-04-23 (Day 3 of 5)
-**Remaining deadline:** Apr 26–27 submission, Apr 28 live finals
-**Current state:** Days 1–2 complete. Engine, streaming, CLI, replay, validation, Streamlit all done. 6 completed runs in simulation_runs/.
-
----
-
-## Day 3 — FastAPI layer + Vite scaffold
-
-### Stage 0 gate (code-side, user runs cloud verification)
-- [ ] Add smoke SSE endpoint to `api/main.py` for buffering test
-- [ ] Azure `/home` env var: `os.getenv("SIMULATION_RUNS_ROOT", "/home/simulation_runs")`
-- [ ] Auth middleware: `X-POLICY-SIM-KEY` header enforcement
-- [ ] Sentry: `sentry_sdk.init(...)` + `/api/debug/boom` test endpoint
-- [ ] USER ACTION: Deploy to Azure App Service, verify SSE unbuffered through Vercel rewrite
-
-### Engine modification
-- [x] `simulation/engine.py` — `RunCallbacks` exists (on_supervisor_text, on_thinking, on_reaction_delta, on_brief_text)
-- [ ] Add `on_reaction_complete: dict[str, Callable]` to `RunCallbacks` + wire in `react_parallel`
-
-### FastAPI layer (`api/`)
-- [ ] `api/__init__.py`
-- [ ] `api/auth.py` — X-POLICY-SIM-KEY middleware
-- [ ] `api/scenarios.py` — list knowledge_base/fiscal/*.md files
-- [ ] `api/stream.py` — engine callbacks → SSE frames (sse-starlette EventSourceResponse)
-- [ ] `api/main.py` — all routes per FRONTEND-PLAN SSE schema:
-  - POST /api/runs → { run_id }
-  - GET /api/runs/:id/stream → SSE
-  - GET /api/runs/:id/replay?delay_ms=N → SSE replay
-  - GET /api/runs/:id/brief → brief.md content
-  - GET /api/runs/:id/validation → validation.json
-  - GET /api/runs/:id/audio/:archetype.mp3 → static (MEDIA-PLAN v1 hook)
-  - GET /api/scenarios → list of .md files
-  - GET /api/health → 200
-  - GET /api/smoke → 20 SSE ticks for buffering test
-  - GET /api/debug/boom → raises for Sentry test
-
-### Vite scaffold (`web/`)
-- [ ] `pnpm create vite web --template react-ts`
-- [ ] Add tailwind, shadcn init, `@tremor/react`
-- [ ] shadcn components: card, button, badge, progress, input, select, dialog, separator, tabs, slider
-- [ ] `web/vite.config.ts` — proxy /api/* → localhost:8000
-- [ ] `web/tailwind.config.ts` — Tremor plugin wired
-- [ ] `web/src/lib/api.ts` — fetch wrappers with X-POLICY-SIM-KEY header
-- [ ] `web/src/lib/sseClient.ts` — fetch+ReadableStream SSE reader, typed events
-- [ ] `web/src/hooks/useRunStream.ts` — reducer keyed by archetype_id
-- [ ] `web/src/components/ArchetypeCard.tsx` (Sarah vertical slice first)
-- [ ] `web/src/components/PolicyInput.tsx`
-- [ ] `web/src/components/SupervisorBriefing.tsx`
-- [ ] `web/src/components/BriefDisplay.tsx`
-- [ ] `web/src/components/ValidationPanel.tsx`
-- [ ] `web/src/App.tsx` — 2×2 grid + banner + brief/validation footer
-
-### Deploy config
-- [ ] `startup.sh` — gunicorn/uvicorn boot for Azure
-- [ ] `vercel.json` — rewrite /api/* → Azure URL + build/install commands
-- [ ] `.github/workflows/azure-deploy.yml` — Python 3.11 → Azure App Service on push to main
-
-### Requirements update
-- [ ] Add to `requirements.txt`: `fastapi`, `uvicorn[standard]`, `sse-starlette`, `sentry-sdk[fastapi]`
+**Last updated:** 2026-04-23 (end of Day 3)
+**Submission deadline:** Apr 26–27, live finals Apr 28
+**Live URL:** https://ai-policy-simulation.vercel.app
 
 ---
 
-## Day 4 — Polish + media + deploy + video
+## Done (Days 1–3)
 
-- [ ] All 4 archetype cards in 2×2 grid
-- [ ] SupervisorBriefing banner (collapses after supervisor_done)
-- [ ] BriefDisplay — streaming markdown + Tremor BarList
-- [ ] ValidationPanel — Tremor Callout + Badge
-- [ ] PolicyInput — scenario dropdown, Live/Replay toggle, Run
-- [ ] Portrait img per ArchetypeCard (MEDIA-PLAN v1, [CUT:4])
-- [ ] Audio player + CSS pulse + SRT caption ([CUT:3])
-- [ ] Thinking translucent overlay ([CUT:3])
-- [ ] Reporter narration audio ([CUT:2])
-- [ ] v2 lip-sync MP4 (stretch/[CUT:1])
-- [ ] Production deploy: GitHub Actions → Azure + Vercel CLI + policysim.tech DNS
-- [ ] .claude/agents/ subagent wrappers (supervisor.md, archetype.md, reporter.md)
-- [ ] README (funder-facing pitch)
-- [ ] docs/video-storyboard.md
-- [ ] 100–200 word submission summary
+### Foundation
+- [x] policy-sim/ tree, requirements.txt, .env.example, .gitignore
+- [x] observers/base.py + utils.py ported from agentic-bo
+- [x] Three SKILL.md files (supervisor, archetype, reporter)
+- [x] Four archetype JSONs (ONS/IFS-sourced)
+- [x] knowledge_base/fiscal/ (uk_vat_2010.md, background_context.md, ifs_2011_validation.json, uk_vat_cut_hypothetical.md)
+
+### Engine + CLI
+- [x] simulation/streaming.py — SDK wrapper (extended thinking + tool use + prompt caching)
+- [x] simulation/engine.py — SimulationEngine with RunCallbacks
+- [x] simulation/cli.py — init/run/report/replay commands
+- [x] simulation/replay.py — JSONL rehydration + paced re-emission
+- [x] simulation/validation.py — IFS directional + internal consistency checks
+- [x] simulation/tts.py — edge-tts synthesis, all 4 archetypes + reporter narration
+- [x] End-to-end CLI verified, 6+ completed runs in simulation_runs/
+
+### Streamlit fallback
+- [x] app/main.py + all components (agent_card, policy_input, brief_display, validation_panel)
+
+### React frontend
+- [x] api/ — FastAPI layer (auth, stream, scenarios, main with all SSE routes)
+- [x] web/ — Vite 8 + React 19 + TypeScript + Tailwind v4 + shadcn
+- [x] web/src/hooks/useRunStream.ts — SSE reducer
+- [x] web/src/lib/sseClient.ts — native EventSource client
+- [x] web/src/lib/api.ts — fetch wrappers + authUrl() helper
+- [x] All 5 components: ArchetypeCard, PolicyInput, SupervisorBriefing, BriefDisplay, ValidationPanel
+- [x] App.tsx — 2x2 grid + KPI row + brief/validation footer
+
+### Deploy
+- [x] Azure App Service live — policy-sim.azurewebsites.net (health 200, SSE pass)
+- [x] Vercel live — ai-policy-simulation.vercel.app (portraits included)
+- [x] Vercel root dir = policy-sim/web/ (prevents FastAPI autodetect)
+- [x] web/vercel.json — /api/* rewrite to Azure
+- [x] Git-connected: push to remote 2 (ossaidqadri/AI-Policy-Simulation) auto-deploys Vercel
+- [x] Azure CORS updated to include ai-policy-simulation.vercel.app
+
+### Media + docs
+- [x] 4 portraits generated (FLUX.1-schnell) in web/public/portraits/
+- [x] scripts/generate_portraits.py committed
+- [x] README rewritten as funder-facing pitch
+- [x] docs/submission-summary.md updated
+- [x] .claude/agents/ — supervisor.md, archetype.md, reporter.md
 
 ---
 
-## Day 5 — Video + submission
-- [ ] Record 3-min demo against --replay on new frontend
-- [ ] Submission upload
+## Remaining (Days 4–5)
+
+### Critical (blocks demo)
+- [ ] Add VITE_POLICY_SIM_KEY to Vercel env vars
+      → vercel.com → ai-policy-simulation → Settings → Environment Variables
+      → same value as Azure POLICY_SIM_KEY
+      → redeploy after adding
+- [ ] Update docs/submission-summary.md URL from policysim.tech → ai-policy-simulation.vercel.app
+
+### Day 4
+- [ ] Record 3-min demo video against --replay on React frontend
+      → bun run dev:full from policy-sim/web/
+      → pick a run_id from simulation_runs/ (gentle-sparrow-8096 has audio+thinking)
+      → use Replay toggle in UI, screen record
+
+### Day 5
+- [ ] Final submission upload with live URL + video
+
+### Stretch (cut if time pressure)
+- [ ] policysim.tech domain (GitHub Education Pack → .TECH Domains → point DNS to Vercel)
+- [ ] v2 lip-sync (Rhubarb + ffmpeg pre-rendered MP4) — MEDIA-PLAN §v2
 
 ---
 
-## Notes / blockers
+## Key file locations
 
-- Cloud accounts needed for Stage 0 gate: Azure App Service, Vercel, Sentry (all via GitHub Education Pack)
-- policysim.tech domain registration via .TECH Domains Pack perk
-- Azure fallback: Railway (30-day trial) if Stage 0 SSE buffering fails by Day 3 afternoon
+| What | Where |
+|---|---|
+| Vercel project config | policy-sim/web/vercel.json |
+| Vercel .vercel link | policy-sim/.vercel/project.json (project ID: prj_D30dsGSUy3gcs3Z3q8VIjDUJ2Xju) |
+| Azure deploy plan | policy-sim/.azure/deployment-plan.md |
+| Portraits | policy-sim/web/public/portraits/ |
+| Demo run for replay | simulation_runs/gentle-sparrow-8096/ |
+| DEMO_RUN_ID constant | policy-sim/web/src/components/PolicyInput.tsx |
