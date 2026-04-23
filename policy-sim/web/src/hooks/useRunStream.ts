@@ -150,8 +150,12 @@ export function useRunStream() {
           case "brief_done":
             dispatch({ type: "BRIEF_DONE", markdown: event.markdown })
             break
-          case "validation":
-            dispatch({ type: "VALIDATION", result: event.result as ValidationResult })
+          case "validation": {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { type: _t, ...validationData } = event
+            dispatch({ type: "VALIDATION", result: validationData as ValidationResult })
+            break
+          }
             break
           case "done":
             dispatch({ type: "DONE" })

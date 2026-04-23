@@ -32,6 +32,6 @@ export type RunEvent =
   | { type: "reaction_complete"; archetype_id: string; reaction: Reaction }
   | { type: "brief_text"; token: string }
   | { type: "brief_done"; markdown: string }
-  | { type: "validation"; result: ValidationResult }
+  | ({ type: "validation" } & ValidationResult)
   | { type: "done" }
   | { type: "error"; phase: string; message: string }
