@@ -1,0 +1,22 @@
+{
+  "policies": [
+    {
+      "id": "uk_vat_2010",
+      "label": "UK VAT Rise 2010",
+      "scenario_path": "knowledge_base/fiscal/uk_vat_2010.md",
+      "description": "UK VAT rise from 17.5% to 20%, announced June 2010 Emergency Budget, implemented 4 January 2011",
+      "ifs_validation_path": "knowledge_base/fiscal/ifs_2011_validation.json",
+      "archetype_ids": ["low_income_worker", "small_business_owner", "urban_professional", "retired_pensioner"],
+      "notes": "Cross-verified against IFS BN116 distributional analysis"
+    },
+    {
+      "id": "uk_vat_cut_hypothetical",
+      "label": "UK VAT Cut (Hypothetical)",
+      "scenario_path": "knowledge_base/fiscal/uk_vat_cut_hypothetical.md",
+      "description": "Hypothetical temporary VAT cut from 20% to 15% as fiscal stimulus",
+      "ifs_validation_path": null,
+      "archetype_ids": ["low_income_worker", "small_business_owner", "urban_professional", "retired_pensioner"],
+      "notes": "No IFS validation data — directional checks will not run; ordering checks use reactions sign"
+    }
+  ]
+}
