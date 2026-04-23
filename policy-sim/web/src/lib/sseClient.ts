@@ -13,10 +13,11 @@ function parseEvent(block: string): RunEvent | null {
   let dataLine = ""
 
   for (const line of block.split("\n")) {
-    if (line.startsWith("event:")) {
-      eventType = line.slice(6).trim()
-    } else if (line.startsWith("data:")) {
-      dataLine = line.slice(5).trim()
+    const trimmedLine = line.replace(/\r$/, "") // strip CRLF
+    if (trimmedLine.startsWith("event:")) {
+      eventType = trimmedLine.slice(6).trim()
+    } else if (trimmedLine.startsWith("data:")) {
+      dataLine = trimmedLine.slice(5).trim()
     }
   }
 
@@ -48,7 +49,9 @@ export async function* streamRun(
   if (!res.ok) throw new Error(`SSE ${res.status}: ${await res.text()}`)
   if (!res.body) throw new Error("No response body")
 
-  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader()
+  // Use TextDecoder directly — pipeThrough(TextDecoderStream) can buffer in Chromium
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder("utf-8")
   let buffer = ""
 
   try {
@@ -56,7 +59,9 @@ export async function* streamRun(
       const { done, value } = await reader.read()
       if (done) break
 
-      buffer += value
+      buffer += decoder.decode(value, { stream: true })
+
+      // SSE blocks are separated by double newlines
       const blocks = buffer.split("\n\n")
       buffer = blocks.pop() ?? ""
 
@@ -66,6 +71,13 @@ export async function* streamRun(
         const event = parseEvent(trimmed)
         if (event) yield event
       }
+    }
+
+    // Flush any remaining data
+    const remaining = decoder.decode()
+    if (remaining.trim()) {
+      const event = parseEvent(remaining.trim())
+      if (event) yield event
     }
   } finally {
     reader.releaseLock()
