@@ -14,7 +14,11 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
         key = os.environ.get("POLICY_SIM_KEY", "")
         if not key:
             return await call_next(request)
-        provided = request.headers.get("X-POLICY-SIM-KEY", "")
+        # Accept key via header OR query param (query param needed for native EventSource)
+        provided = (
+            request.headers.get("X-POLICY-SIM-KEY", "")
+            or request.query_params.get("key", "")
+        )
         if provided != key:
             raise HTTPException(status_code=401, detail="Unauthorized")
         return await call_next(request)

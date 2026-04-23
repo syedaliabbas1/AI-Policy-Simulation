@@ -1,30 +1,20 @@
-// fetch + ReadableStream SSE client — must use fetch (not EventSource) to set custom headers
+// Native EventSource SSE client — no buffering issues, browser-native streaming
+// API key passed as ?key= query param since EventSource cannot set custom headers
 
 import type { RunEvent } from "./events"
 
 const API_KEY = import.meta.env.VITE_POLICY_SIM_KEY ?? ""
 
-function authHeaders(): HeadersInit {
-  return API_KEY ? { "X-POLICY-SIM-KEY": API_KEY } : {}
+function sseUrl(path: string): string {
+  if (!API_KEY) return path
+  const sep = path.includes("?") ? "&" : "?"
+  return `${path}${sep}key=${encodeURIComponent(API_KEY)}`
 }
 
-function parseEvent(block: string): RunEvent | null {
-  let eventType = "message"
-  let dataLine = ""
-
-  for (const line of block.split("\n")) {
-    const trimmedLine = line.replace(/\r$/, "") // strip CRLF
-    if (trimmedLine.startsWith("event:")) {
-      eventType = trimmedLine.slice(6).trim()
-    } else if (trimmedLine.startsWith("data:")) {
-      dataLine = trimmedLine.slice(5).trim()
-    }
-  }
-
-  if (!dataLine) return null
-
+function parseData(eventType: string, data: string): RunEvent | null {
+  if (!data) return null
   try {
-    const payload = JSON.parse(dataLine)
+    const payload = JSON.parse(data)
     return { type: eventType, ...payload } as RunEvent
   } catch {
     return null
@@ -37,49 +27,66 @@ export async function* streamRun(
   delayMs = 30,
   signal?: AbortSignal,
 ): AsyncGenerator<RunEvent> {
-  const url = replay
+  const basePath = replay
     ? `/api/runs/${runId}/replay?delay_ms=${delayMs}`
     : `/api/runs/${runId}/stream`
 
-  const res = await fetch(url, {
-    headers: { ...authHeaders(), Accept: "text/event-stream" },
-    signal,
-  })
+  const url = sseUrl(basePath)
 
-  if (!res.ok) throw new Error(`SSE ${res.status}: ${await res.text()}`)
-  if (!res.body) throw new Error("No response body")
+  yield* openEventSource(url, signal)
+}
 
-  // Use TextDecoder directly — pipeThrough(TextDecoderStream) can buffer in Chromium
-  const reader = res.body.getReader()
-  const decoder = new TextDecoder("utf-8")
-  let buffer = ""
+function openEventSource(url: string, signal?: AbortSignal): AsyncGenerator<RunEvent> {
+  // Wrap EventSource in an async generator via a queue
+  type QueueItem = RunEvent | Error | null
+  const queue: QueueItem[] = []
+  let resolve: (() => void) | null = null
+  const notify = () => { if (resolve) { resolve(); resolve = null } }
 
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
+  const es = new EventSource(url)
 
-      buffer += decoder.decode(value, { stream: true })
+  const eventTypes = [
+    "run_started", "supervisor_text", "supervisor_done",
+    "thinking", "reaction_delta", "reaction_complete",
+    "brief_text", "brief_done", "validation", "done", "error",
+  ]
 
-      // SSE blocks are separated by double newlines
-      const blocks = buffer.split("\n\n")
-      buffer = blocks.pop() ?? ""
-
-      for (const block of blocks) {
-        const trimmed = block.trim()
-        if (!trimmed) continue
-        const event = parseEvent(trimmed)
-        if (event) yield event
-      }
-    }
-
-    // Flush any remaining data
-    const remaining = decoder.decode()
-    if (remaining.trim()) {
-      const event = parseEvent(remaining.trim())
-      if (event) yield event
-    }
-  } finally {
-    reader.releaseLock()
+  for (const eventType of eventTypes) {
+    es.addEventListener(eventType, (e: Event) => {
+      const me = e as MessageEvent
+      const event = parseData(eventType, me.data)
+      if (event) { queue.push(event); notify() }
+    })
   }
+
+  es.onerror = () => {
+    queue.push(new Error("EventSource connection error"))
+    notify()
+    es.close()
+  }
+
+  if (signal) {
+    signal.addEventListener("abort", () => { es.close(); queue.push(null); notify() })
+  }
+
+  async function* gen(): AsyncGenerator<RunEvent> {
+    try {
+      while (true) {
+        if (queue.length === 0) {
+          await new Promise<void>((r) => { resolve = r })
+        }
+        while (queue.length > 0) {
+          const item = queue.shift()!
+          if (item === null) return
+          if (item instanceof Error) throw item
+          if (item.type === "done") { es.close(); return }
+          yield item
+        }
+      }
+    } finally {
+      es.close()
+    }
+  }
+
+  return gen()
 }
