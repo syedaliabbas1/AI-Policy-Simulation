@@ -1,1 +1,7 @@
 .playwright-mcp/
+
+# Tremor reference libraries (copy-paste source, not our code)
+tremor/
+tremor-blocks/
+template-dashboard-oss/
+template-insights/
