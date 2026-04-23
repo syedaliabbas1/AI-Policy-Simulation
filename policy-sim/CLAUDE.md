@@ -45,7 +45,7 @@ Supervisor → 4 parallel archetype calls (asyncio.gather) → reporter. Each ca
 - `api/stream.py` — asyncio.Queue SSE generator
 - `web/src/hooks/useRunStream.ts` — SSE reducer keyed by archetype_id
 - `web/src/lib/sseClient.ts` — native EventSource client
-- `web/src/components/PolicyInput.tsx` — update DEMO_RUN_ID after next live run
+- `web/src/components/PolicyInput.tsx` — update DEMO_RUN_ID to match a run uploaded to `/home/simulation_runs/` on Azure (local runs are not visible in prod; see root CLAUDE.md for upload procedure)
 
 ## Model
 
