@@ -1,12 +1,12 @@
 {
   "id": "small_business_owner",
-  "display_name": "Mark, 48, self-employed builder",
+  "display_name": "Mark, 48, self-employed builder and general contractor",
   "demographics": {
     "age": 48,
     "household": "married, two adult children (left home), wife works part-time in retail",
     "region": "Rotherham, South Yorkshire",
     "income_gbp": 38500,
-    "employment": "sole trader, building and renovation; annual turnover approx £95,000; VAT-registered since 2007"
+    "employment": "sole trader, building and general contracting (brickwork, plastering, roofing, renovation); annual turnover approx £95,000; VAT-registered since 2007; not a carpenter"
   },
   "financial_context": {
     "savings_gbp": 12000,
