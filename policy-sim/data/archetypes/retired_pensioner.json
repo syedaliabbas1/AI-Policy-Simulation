@@ -34,5 +34,6 @@
     "winter fuel payment"
   ],
   "communication_style": "measured and stoic; draws on lived experience and historical comparisons; concerned about younger generations as much as himself; does not complain loudly but quietly registers the squeeze; references specific prices and specific years",
-  "data_sources": "ONS Family Resources Survey 2010/11, pensioner household income bottom-to-second quintile; DWP basic state pension rate 2010/11; Stoke-on-Trent council tax 2010; DECC domestic gas/electricity price data 2010"
+  "data_sources": "ONS Family Resources Survey 2010/11, pensioner household income bottom-to-second quintile; DWP basic state pension rate 2010/11; Stoke-on-Trent council tax 2010; DECC domestic gas/electricity price data 2010",
+  "portrait_path": "data/archetypes/portraits/retired_pensioner.png"
 }

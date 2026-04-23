@@ -1,13 +1,13 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { Briefing, Reaction } from "@/lib/events"
 import type { ArchetypeState } from "@/hooks/useRunStream"
 
 // Static persona metadata — matches data/archetypes/*.json
 const PERSONA_META: Record<string, { name: string; age: number; region: string; role: string; ref: string }> = {
-  low_income_worker:    { name: "Sarah",    age: 34, region: "North East",    role: "Part-time carer",       ref: "PS-001" },
-  small_business_owner: { name: "David",    age: 48, region: "West Midlands", role: "Self-employed trader",  ref: "PS-002" },
-  urban_professional:   { name: "James",    age: 32, region: "London",        role: "Urban professional",    ref: "PS-003" },
-  retired_pensioner:    { name: "Margaret", age: 72, region: "South West",    role: "State pension reliant", ref: "PS-004" },
+  low_income_worker:    { name: "Sarah",  age: 34, region: "Sunderland",       role: "Part-time carer",        ref: "PS-001" },
+  small_business_owner: { name: "Mark",   age: 48, region: "South Yorkshire",  role: "Self-employed builder",  ref: "PS-002" },
+  urban_professional:   { name: "Priya",  age: 31, region: "Islington",        role: "Financial analyst",      ref: "PS-003" },
+  retired_pensioner:    { name: "Arthur", age: 72, region: "Stoke-on-Trent",   role: "Retired factory worker", ref: "PS-004" },
 }
 
 interface Props {
@@ -82,6 +82,24 @@ function ReactionDisplay({ reaction }: { reaction: Reaction }) {
   )
 }
 
+function PortraitAvatar({ archetypeId, name }: { archetypeId: string; name: string }) {
+  const [hasImage, setHasImage] = useState(true)
+  return (
+    <div className="w-10 h-10 rounded-full overflow-hidden border border-ps-2 shrink-0 bg-ps-surface-2 flex items-center justify-center">
+      {hasImage ? (
+        <img
+          src={`/portraits/${archetypeId}.png`}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={() => setHasImage(false)}
+        />
+      ) : (
+        <span className="text-xs font-semibold text-ps-muted">{name.charAt(0)}</span>
+      )}
+    </div>
+  )
+}
+
 export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) {
   const meta = PERSONA_META[archetypeId] ?? { name: archetypeId, age: 0, region: "UK", role: "", ref: "PS-???" }
   const thinkingRef = useRef<HTMLDivElement>(null)
@@ -109,15 +127,18 @@ export function ArchetypeCard({ archetypeId, archetypeState, briefing }: Props) 
     >
       {/* Card header */}
       <div className="flex items-start justify-between px-4 py-3 border-b border-ps bg-ps-surface-2">
-        <div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold text-ps-heading tracking-tight">{meta.name}</span>
-            <span className="text-xs text-ps-muted">{meta.age}</span>
-          </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="label-caps">{meta.region}</span>
-            <span className="text-ps-faint">·</span>
-            <span className="label-caps">{meta.role}</span>
+        <div className="flex items-center gap-3">
+          <PortraitAvatar archetypeId={archetypeId} name={meta.name} />
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm font-semibold text-ps-heading tracking-tight">{meta.name}</span>
+              <span className="text-xs text-ps-muted">{meta.age}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="label-caps">{meta.region}</span>
+              <span className="text-ps-faint">·</span>
+              <span className="label-caps">{meta.role}</span>
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">

@@ -32,5 +32,6 @@
     "energy prices"
   ],
   "communication_style": "plain, direct, occasionally frustrated; grounds everything in concrete daily examples — the weekly shop, the school run, the energy meter; short sentences; no economic jargon",
-  "data_sources": "ONS Family Resources Survey 2010/11, bottom income quintile, single-parent household; North East England median private rent 2010; National Minimum Wage April 2010 £5.93/hr (care sector often paid minimum)"
+  "data_sources": "ONS Family Resources Survey 2010/11, bottom income quintile, single-parent household; North East England median private rent 2010; National Minimum Wage April 2010 £5.93/hr (care sector often paid minimum)",
+  "portrait_path": "data/archetypes/portraits/low_income_worker.png"
 }

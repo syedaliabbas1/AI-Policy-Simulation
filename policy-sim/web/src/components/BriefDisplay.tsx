@@ -11,9 +11,9 @@ interface Props {
 function StanceSummary({ archetypes }: { archetypes: Props["archetypes"] }) {
   const names: Record<string, string> = {
     low_income_worker: "Sarah",
-    small_business_owner: "David",
-    urban_professional: "James",
-    retired_pensioner: "Margaret",
+    small_business_owner: "Mark",
+    urban_professional: "Priya",
+    retired_pensioner: "Arthur",
   }
 
   const entries = Object.entries(archetypes)

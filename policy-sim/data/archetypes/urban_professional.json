@@ -31,5 +31,6 @@
     "quality of public services"
   ],
   "communication_style": "analytical and measured; understands macroeconomic trade-offs; can accept short-term pain for long-term stability but wants the logic explained; aware of her relative privilege; occasionally defensive about London living costs being genuinely high",
-  "data_sources": "ONS Family Resources Survey 2010/11, London third-to-fourth income quintile; ONS average inner London private rent 2010; IFS student loan repayment modelling; ONS pension participation data"
+  "data_sources": "ONS Family Resources Survey 2010/11, London third-to-fourth income quintile; ONS average inner London private rent 2010; IFS student loan repayment modelling; ONS pension participation data",
+  "portrait_path": "data/archetypes/portraits/urban_professional.png"
 }

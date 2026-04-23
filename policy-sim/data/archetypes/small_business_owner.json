@@ -32,5 +32,6 @@
     "fuel duty"
   ],
   "communication_style": "pragmatic and numbers-focused; talks in margins, day rates, and cash flow; direct; suspicious of government rhetoric; compares quotes to actual invoices; occasionally fatalistic about policy impact on 'people like me'",
-  "data_sources": "ONS Family Resources Survey 2010/11, self-employed third income quintile; VAT registration threshold 2010 was £70,000 turnover; South Yorkshire median mortgage 2010; Construction Industry Training Board wage data"
+  "data_sources": "ONS Family Resources Survey 2010/11, self-employed third income quintile; VAT registration threshold 2010 was £70,000 turnover; South Yorkshire median mortgage 2010; Construction Industry Training Board wage data",
+  "portrait_path": "data/archetypes/portraits/small_business_owner.png"
 }
