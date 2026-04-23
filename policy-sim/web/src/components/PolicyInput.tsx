@@ -8,7 +8,7 @@ interface Props {
   onStop: () => void
 }
 
-const DEMO_RUN_ID = "rapid-heron-2827"
+const DEMO_RUN_ID = "gentle-sparrow-8096"
 
 export function PolicyInput({ phase, onRun, onStop }: Props) {
   const [scenarios, setScenarios] = useState<Scenario[]>([])
