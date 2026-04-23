@@ -44,3 +44,7 @@ Use `claude-opus-4-7` for all archetype, supervisor, and reporter calls. Extende
 - Do not edit archived docs in `docs/archive/`
 - `simulation_runs/` is gitignored — never commit run artifacts
 - Do not add dependencies beyond `requirements.txt` without checking with the user
+
+## Session hygiene
+
+- **Proactive context compaction**: Don't wait until context is nearly full. Compact mid-session before quality degrades — especially during long frontend/backend build sessions.

@@ -38,6 +38,7 @@ class RunCallbacks:
     on_supervisor_text: TextCallback = None
     on_thinking: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
     on_reaction_delta: dict[str, Callable[[str], Awaitable[None]]] = field(default_factory=dict)
+    on_reaction_complete: dict[str, Callable[[dict], Awaitable[None]]] = field(default_factory=dict)
     on_brief_text: TextCallback = None
 
 
@@ -179,6 +180,9 @@ class SimulationEngine:
                 "data": reaction,
                 "ts": utc_now_iso(),
             })
+            on_complete = cbs.on_reaction_complete.get(archetype_id)
+            if on_complete:
+                await on_complete(reaction)
             return archetype_id, reaction
 
         results = await asyncio.gather(*[_react_one(p) for p in self._personas])

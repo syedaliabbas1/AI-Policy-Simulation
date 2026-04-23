@@ -1,0 +1,11 @@
+{
+  "buildCommand": "bun --cwd web run build",
+  "installCommand": "bun install --cwd web",
+  "outputDirectory": "web/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://policy-sim.azurewebsites.net/api/:path*"
+    }
+  ]
+}
