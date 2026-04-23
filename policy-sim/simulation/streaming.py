@@ -10,7 +10,7 @@ import anthropic
 from .caching import make_cache_block
 
 MODEL = "claude-opus-4-7"
-ARCHETYPE_THINKING_EFFORT = "high"
+THINKING_BUDGET_TOKENS = 8000
 
 # Matches archetype-agent/SKILL.md output spec exactly
 REACTION_TOOL: dict[str, Any] = {
@@ -115,14 +115,21 @@ async def stream_archetype(
     skill_body: str,
     on_event: EventCallback = None,
 ) -> dict[str, Any]:
-    """Stream one archetype reaction with extended thinking. Returns parsed Reaction dict."""
-    tool_parts: list[str] = []
+    """Stream one archetype reaction with extended thinking. Returns parsed Reaction dict.
 
-    async with client.messages.stream(
+    claude-opus-4-7 uses adaptive thinking via the beta API. Thinking content is encrypted
+    (redacted_thinking) — we emit a single synthetic thinking token when the reasoning block
+    starts so the UI shows the thinking phase is active, then stream the tool-call JSON as
+    reaction_delta tokens.
+    """
+    tool_parts: list[str] = []
+    thinking_block_emitted = False
+
+    async with client.beta.messages.stream(
         model=MODEL,
         max_tokens=16000,
         thinking={"type": "adaptive"},
-        output_config={"effort": ARCHETYPE_THINKING_EFFORT},
+        output_config={"effort": "max"},
         tools=[REACTION_TOOL],
         tool_choice={"type": "auto"},
         system=[make_cache_block(skill_body)],
@@ -143,10 +150,23 @@ async def stream_archetype(
         ],
     ) as stream:
         async for event in stream:
+            # Detect start of thinking block — emit a synthetic token so the UI knows
+            if event.type == "content_block_start":
+                block_type = getattr(event.content_block, "type", "")
+                if block_type in ("thinking", "redacted_thinking") and not thinking_block_emitted:
+                    thinking_block_emitted = True
+                    if on_event:
+                        await on_event(
+                            "thinking",
+                            f"Opus 4.7 extended reasoning active for {persona.get('display_name', persona.get('id', 'archetype'))}...\n\nAnalysing policy impact against household finances, income quintile, and lived experience...\n",
+                        )
+                continue
+
             if event.type != "content_block_delta":
                 continue
             delta = event.delta
             if delta.type == "thinking_delta":
+                # Visible thinking text (may appear on some models/configurations)
                 if on_event:
                     await on_event("thinking", delta.thinking)
             elif delta.type == "input_json_delta":
