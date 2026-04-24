@@ -13,7 +13,6 @@ from sse_starlette.sse import EventSourceResponse
 
 from simulation.engine import SimulationEngine
 from simulation.utils import RunPaths, read_json, read_last_complete_event
-
 from .auth import ApiKeyMiddleware
 from .scenarios import list_scenarios, list_policies, get_policy
 from .stream import live_stream, replay_stream
@@ -114,11 +113,20 @@ async def list_runs():
             continue
         try:
             state = read_json(state_path)
+            paths = RunPaths(run_dir=run_dir)
+            # Only include runs that have full data: brief + validation + reactions
+            has_brief = paths.brief.exists()
+            has_validation = paths.validation.exists()
+            has_reactions = paths.reactions_dir.exists() and any(
+                paths.reactions_dir.glob("*.jsonl")
+            )
+            has_full_data = has_brief and has_validation and has_reactions
             runs.append({
                 "run_id": run_dir.name,
                 "status": state.get("status", "unknown"),
                 "created_at": state.get("created_at", ""),
                 "scenario_path": state.get("scenario_path", ""),
+                "has_full_data": has_full_data,
             })
         except Exception:
             continue

@@ -11,6 +11,12 @@ import {
 } from "@/components/ui/select"
 import { IconPlayerPlay, IconLoader, IconRepeat } from "@tabler/icons-react"
 
+export interface CompletedRunItem {
+  run_id: string
+  scenario_path: string
+  has_full_data?: boolean
+}
+
 export interface SimulationHeaderProps {
   selectedScenario: string
   onScenarioChange: (path: string) => void
@@ -21,7 +27,7 @@ export interface SimulationHeaderProps {
   onModeChange?: (mode: "live" | "replay") => void
   replayRunId?: string
   onReplayRunIdChange?: (id: string) => void
-  completedRuns?: Array<{ run_id: string; scenario_path: string }>
+  completedRuns?: CompletedRunItem[]
 }
 
 export function SimulationHeader({
@@ -39,12 +45,20 @@ export function SimulationHeader({
   const { scenarios, loading } = useScenarios()
   const isDisabled = isRunning || loading
 
-  const completed = completedRuns.map((r) => ({
-    run_id: r.run_id,
-    label: r.scenario_path
-      ? r.scenario_path.replace(/\\/g, "/").split("/").pop()?.replace(/\.(md|json)$/, "").replace(/[_-]/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? r.run_id
-      : r.run_id,
-  }))
+  const replayRuns = completedRuns
+    .filter((r) => r.has_full_data !== false)
+    .map((r) => ({
+      run_id: r.run_id,
+      label: r.scenario_path
+        ? r.scenario_path
+            .replace(/\\/g, "/")
+            .split("/")
+            .pop()
+            ?.replace(/\.(md|json)$/, "")
+            .replace(/[_-]/g, " ")
+            .replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? r.run_id
+        : r.run_id,
+    }))
 
   return (
     <div className="flex items-center gap-3 px-4 lg:px-6">
@@ -94,7 +108,7 @@ export function SimulationHeader({
         </Select>
       ) : (
         <Select
-          items={completed}
+          items={replayRuns}
           value={replayRunId ?? ""}
           onValueChange={(v) => onReplayRunIdChange?.(v)}
         >
@@ -102,12 +116,12 @@ export function SimulationHeader({
             <SelectValue placeholder="Select a run to replay..." />
           </SelectTrigger>
           <SelectContent>
-            {completed.length === 0 && (
+            {replayRuns.length === 0 && (
               <SelectItem value="__empty__" disabled>
                 No completed runs
               </SelectItem>
             )}
-            {completed.map((r) => (
+            {replayRuns.map((r) => (
               <SelectItem key={r.run_id} value={r.run_id}>
                 {r.label}
               </SelectItem>
