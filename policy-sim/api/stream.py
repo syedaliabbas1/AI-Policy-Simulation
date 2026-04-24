@@ -146,15 +146,8 @@ async def replay_stream(run_id: str, delay_ms: int = 30) -> AsyncGenerator[dict,
     state = read_json(state_path)
     paths = RunPaths(run_dir=run_dir)
 
-    # Always use the 4 canonical archetype IDs for replay stability.
-    # This avoids filesystem-layout mismatches for older runs that predate
-    # the multi-archetype naming structure.
-    archetype_ids = [
-        "citizen_low_income",
-        "small_business",
-        "public_worker",
-        "pensioner",
-    ]
+    # Collect archetype IDs from saved briefings
+    archetype_ids = [p.stem for p in sorted(paths.briefings_dir.glob("*.json"))] if paths.briefings_dir.exists() else []
 
     yield _frame("run_started", {
         "run_id": run_id,

@@ -109,6 +109,7 @@ export function SimulationHeader({
           items={replayRuns}
           value={replayRunId ?? ""}
           onValueChange={(v) => onReplayRunIdChange?.(v)}
+          disabled={isRunning}
         >
           <SelectTrigger className="w-64">
             <SelectValue placeholder="Select a run to replay..." />
