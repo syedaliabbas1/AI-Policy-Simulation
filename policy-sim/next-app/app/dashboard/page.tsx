@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { IconChartBar, IconChecklist, IconArrowRight } from "@tabler/icons-react"
+import { IconChartBar, IconChecklist } from "@tabler/icons-react"
 import Link from "next/link"
 
 interface RunSummary {

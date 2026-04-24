@@ -215,19 +215,6 @@ export default function SimulationPage() {
       .filter(Boolean) as Array<{ name: string; displayName: string; score: number }>
   }, [archetypeIds, archetypes])
 
-  const scenarioComponent = useMemo(
-    () => (
-      <SimulationHeader
-        selectedScenario={selectedScenario}
-        onScenarioChange={setSelectedScenario}
-        onRun={handleRun}
-        isRunning={runStatus === "running"}
-        disabled={!selectedScenario}
-      />
-    ),
-    [selectedScenario, handleRun, runStatus]
-  )
-
   return (
     <SidebarProvider
       style={

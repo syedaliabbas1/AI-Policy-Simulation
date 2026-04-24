@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning"
@@ -48,10 +49,11 @@ export function ArchetypeReactionCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {imagePath ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
+              <Image
                 src={imagePath}
                 alt={displayName}
+                width={36}
+                height={36}
                 className="size-9 rounded-full object-cover"
               />
             ) : (

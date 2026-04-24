@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -13,7 +13,7 @@ import { StanceBarChart } from "@/components/simulation/stance-bar-chart"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-export default function IFSPage() {
+function IFSPageInner() {
   const searchParams = useSearchParams()
   const runIdParam = searchParams.get("run")
 
@@ -100,6 +100,39 @@ export default function IFSPage() {
               <ValidationPanel result={validationResult} />
             </>
           )}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}
+
+export default function IFSPage() {
+  return (
+    <Suspense fallback={<IFSLoadingState />}>
+      <IFSPageInner />
+    </Suspense>
+  )
+}
+
+function IFSLoadingState() {
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader title="IFS Validation" />
+        <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
+          <Card>
+            <CardContent className="flex items-center gap-3 p-4">
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            </CardContent>
+          </Card>
         </div>
       </SidebarInset>
     </SidebarProvider>
