@@ -10,6 +10,7 @@ import { ValidationPanel } from "@/components/ValidationPanel"
 import { Sidebar } from "@/components/Sidebar"
 import { Card } from "@/components/tremor/Card"
 import { ComparePage } from "@/pages/ComparePage"
+import { DashboardPage } from "@/pages/DashboardPage"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tremor/Tabs"
 import type { ArchetypeState } from "@/hooks/useRunStream"
 
@@ -125,14 +126,7 @@ export default function App() {
         <main className="flex-1 lg:pl-72">
           {activeView === "simulation" && <SimulationView />}
           {activeView === "compare" && <ComparePage />}
-          {activeView === "archetypes" && (
-            <div className="px-4 md:px-6 py-6">
-              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-50">Archetypes</h2>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
-                Archetype analysis view coming soon.
-              </p>
-            </div>
-          )}
+          {activeView === "dashboard" && <DashboardPage />}
           {activeView === "ifs-validation" && (
             <div className="px-4 md:px-6 py-6">
               <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-50">IFS Validation</h2>

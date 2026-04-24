@@ -22,10 +22,10 @@ import {
 } from "./tremor/Drawer"
 
 const NAV_ITEMS = [
-  { id: "simulation",       label: "Simulation",      icon: RiHome5Line },
-  { id: "archetypes",       label: "Archetypes",        icon: RiBarChartBoxLine },
-  { id: "ifs-validation",   label: "IFS Validation",   icon: RiFileList3Line },
-  { id: "compare",          label: "Compare",          icon: RiScales3Line },
+  { id: "simulation",       label: "Simulation",    icon: RiHome5Line },
+  { id: "dashboard",        label: "Dashboard",     icon: RiBarChartBoxLine },
+  { id: "compare",          label: "Compare",       icon: RiScales3Line },
+  { id: "ifs-validation",   label: "IFS Validation", icon: RiFileList3Line },
 ] as const
 
 const SHORTCUTS = [
