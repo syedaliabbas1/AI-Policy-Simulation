@@ -15,166 +15,85 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { IconDashboard, IconListDetails, IconChartBar, IconFolder, IconUsers, IconCamera, IconFileDescription, IconFileAi, IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconInnerShadowTop } from "@tabler/icons-react"
+import {
+  IconDashboard,
+  IconPlay,
+  IconChartBar,
+  IconChecklist,
+  IconSettings,
+  IconHelp,
+  IconSearch,
+  IconDatabase,
+  IconReport,
+  IconFileWord,
+  IconInnerShadowTop,
+} from "@tabler/icons-react"
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Policy Sim",
+    email: "admin@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: (
-        <IconDashboard
-        />
-      ),
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: (
-        <IconListDetails
-        />
-      ),
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: (
-        <IconChartBar
-        />
-      ),
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: (
-        <IconFolder
-        />
-      ),
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: (
-        <IconUsers
-        />
-      ),
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <IconCamera
-        />
-      ),
+      title: "Simulation",
+      url: "/simulation",
+      icon: <IconPlay />,
       isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Proposal",
-      icon: (
-        <IconFileDescription
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Compare",
+      url: "/compare",
+      icon: <IconChartBar />,
     },
     {
-      title: "Prompts",
-      icon: (
-        <IconFileAi
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: <IconDashboard />,
+    },
+    {
+      title: "IFS Check",
+      url: "/ifs",
+      icon: <IconChecklist />,
     },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "#",
-      icon: (
-        <IconSettings
-        />
-      ),
+      icon: <IconSettings />,
     },
     {
       title: "Get Help",
       url: "#",
-      icon: (
-        <IconHelp
-        />
-      ),
+      icon: <IconHelp />,
     },
     {
       title: "Search",
       url: "#",
-      icon: (
-        <IconSearch
-        />
-      ),
+      icon: <IconSearch />,
     },
   ],
   documents: [
     {
       name: "Data Library",
       url: "#",
-      icon: (
-        <IconDatabase
-        />
-      ),
+      icon: <IconDatabase />,
     },
     {
       name: "Reports",
       url: "#",
-      icon: (
-        <IconReport
-        />
-      ),
+      icon: <IconReport />,
     },
     {
       name: "Word Assistant",
       url: "#",
-      icon: (
-        <IconFileWord
-        />
-      ),
+      icon: <IconFileWord />,
     },
   ],
 }
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -186,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               render={<a href="#" />}
             >
               <IconInnerShadowTop className="size-5!" />
-              <span className="text-base font-semibold">Acme Inc.</span>
+              <span className="text-base font-semibold">Acme Policy</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
