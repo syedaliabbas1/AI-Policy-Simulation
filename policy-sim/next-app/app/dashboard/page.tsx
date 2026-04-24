@@ -119,11 +119,11 @@ export default function DashboardPage() {
                         <TableCell className="text-sm text-muted-foreground">{formatDate(run.created_at)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
-                            <Button render={<Link href={`/ifs?run=${run.run_id}`} />} size="sm" variant="ghost" className="h-7 gap-1">
+                            <Button render={<Link href={`/ifs?run=${run.run_id}`} />} size="sm" variant="ghost" className="h-7 gap-1" nativeButton={false}>
                               <IconChecklist data-icon="inline-start" className="size-3" />
                               IFS
                             </Button>
-                            <Button render={<Link href={`/compare?runs=${run.run_id}`} />} size="sm" variant="ghost" className="h-7 gap-1">
+                            <Button render={<Link href={`/compare?runs=${run.run_id}`} />} size="sm" variant="ghost" className="h-7 gap-1" nativeButton={false}>
                               <IconChartBar data-icon="inline-start" className="size-3" />
                               Compare
                             </Button>
