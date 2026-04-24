@@ -40,7 +40,7 @@ app = FastAPI(title="policy-sim API", docs_url=None, redoc_url=None)
 app.add_middleware(ApiKeyMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(","),
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
