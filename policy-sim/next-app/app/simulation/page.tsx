@@ -274,20 +274,23 @@ export default function SimulationPage() {
             isStreaming={runStatus === "running" && !supervisorText.includes("\n\n")}
           />
 
-          {/* KPI Row: 4 archetype cards */}
+          {/* KPI Row: 4 archetype cards — always visible */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {archetypeIds.map((id) => {
-              const meta = ARCHETYPE_META[id] ?? {
-                displayName: id,
-                description: "",
-              }
+            {Object.entries(ARCHETYPE_META).map(([id, meta]) => {
+              const state = archetypes[id]
               return (
                 <ArchetypeKPICard
                   key={id}
                   archetypeId={id}
                   displayName={meta.displayName}
                   description={meta.description}
-                  state={archetypes[id]}
+                  state={state ?? {
+                    thinkingText: "",
+                    reactionText: "",
+                    isStreaming: false,
+                    reactionDone: false,
+                    reaction: null,
+                  }}
                 />
               )
             })}
