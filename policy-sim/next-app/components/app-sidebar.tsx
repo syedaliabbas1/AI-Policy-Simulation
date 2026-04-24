@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar"
 import {
   IconDashboard,
-  IconPlay,
+  IconPlayerPlay,
   IconChartBar,
   IconChecklist,
   IconSettings,
@@ -39,7 +39,7 @@ const data = {
     {
       title: "Simulation",
       url: "/simulation",
-      icon: <IconPlay />,
+      icon: <IconPlayerPlay />,
       isActive: true,
     },
     {
