@@ -42,7 +42,7 @@
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* ── Base reset ──────────────────────────────────────── */
+/* ── Typography baseline ─────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -56,6 +56,47 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Enable kerning and OpenType features */
+  body, p, h1, h2, h3, h4, h5, h6, span, div {
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-kerning: normal;
+    font-kerning: normal;
+  }
+
+  /* Default line length: 45–90 chars */
+  p, li, blockquote {
+    max-width: 68ch;
+  }
+
+  /* Body line spacing: 120–145% of font size */
+  p, li {
+    line-height: 1.45;
+  }
+
+  /* Oldstyle figures in body text, tabular in UI */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Small caps for labels with uppercase tracking (requires font with real smcp) */
+  .small-caps,
+  [class*="uppercase"]:not(a) {
+    font-variant-caps: small-caps;
+    letter-spacing: 0.07em;
+  }
+
+  /* Never underline — use bold instead (exception: links get subtle underline) */
+  a:not([class*="no-underline"]) {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  u { text-decoration: none; }
+
+  /* Mark / paragraph marks always followed by non-breaking space */
+  sup, mark { white-space: nowrap; }
 
   #root {
     min-height: 100svh;
