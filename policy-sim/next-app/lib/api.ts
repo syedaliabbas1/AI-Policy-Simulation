@@ -9,7 +9,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
 
 function authUrl(path: string): string {
-  const key = process.env.POLICY_SIM_KEY ?? ""
+  const key = process.env.NEXT_PUBLIC_POLICY_SIM_KEY ?? ""
   return key ? `${API_BASE}${path}?key=${key}` : `${API_BASE}${path}`
 }
 

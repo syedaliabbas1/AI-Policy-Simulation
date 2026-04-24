@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Conversation, ConversationContent } from "@/components/ai-elements/conversation"
+import { Streamdown, type PluggableList } from "streamdown"
 
 interface PolicyBriefProps {
   markdown: string
@@ -12,19 +13,21 @@ interface PolicyBriefProps {
 }
 
 export function PolicyBrief({ markdown, isStreaming = false, validated = false }: PolicyBriefProps) {
-  const [streamdown, setStreamdown] = useState<typeof import("streamdown") | null>(null)
-  const [plugins, setPlugins] = useState<Record<string, unknown> | null>(null)
+  const [plugins, setPlugins] = useState<PluggableList | null>(null)
 
   useEffect(() => {
     Promise.all([
-      import("streamdown"),
       import("@streamdown/cjk"),
       import("@streamdown/code"),
       import("@streamdown/math"),
       import("@streamdown/mermaid"),
-    ]).then(([sd, cjk, code, math, mermaid]) => {
-      setStreamdown(sd)
-      setPlugins({ cjk, code, math, mermaid })
+    ]).then(([cjk, code, math, mermaid]) => {
+      const list: PluggableList = []
+      if (cjk.createCjkPlugin) list.push(cjk.createCjkPlugin())
+      if (code.createCodePlugin) list.push(code.createCodePlugin())
+      if (math.createMathPlugin) list.push(math.createMathPlugin())
+      if (mermaid.createMermaidPlugin) list.push(mermaid.createMermaidPlugin(mermaid.mermaid))
+      setPlugins(list)
     })
   }, [])
 
@@ -51,8 +54,8 @@ export function PolicyBrief({ markdown, isStreaming = false, validated = false }
           <ConversationContent>
             {markdown ? (
               <div className="text-sm leading-relaxed text-muted-foreground prose prose-sm dark:prose-invert max-w-none">
-                {streamdown && plugins ? (
-                  <streamdown.Streamdown plugins={plugins}>{markdown}</streamdown.Streamdown>
+                {plugins ? (
+                  <Streamdown plugins={plugins}>{markdown}</Streamdown>
                 ) : (
                   <div className="animate-pulse space-y-2">
                     <div className="h-4 w-full rounded bg-muted" />
