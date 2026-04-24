@@ -55,4 +55,8 @@ export async function compareBriefs(runIds: string[]): Promise<CompareBriefsResp
   return get<CompareBriefsResponse>(`/api/runs/compare/briefs?runs=${runIds.join(",")}`)
 }
 
+export function getReplayUrl(runId: string, delayMs = 30): string {
+  return authUrl(`/api/runs/${runId}/replay?delay_ms=${delayMs}`)
+}
+
 export { API_BASE }

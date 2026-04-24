@@ -21,10 +21,18 @@ function formatScore(score: number): string {
   return `${sign}${Math.round(score)}`
 }
 
+const ARCHETYPE_IMAGE: Record<string, string> = {
+  citizen_low_income: "/sarah.png",
+  small_business: "/mark.png",
+  public_worker: "/priya.png",
+  pensioner: "/arthur.png",
+}
+
 export function ArchetypeReactionCard({
   displayName,
   description,
   state,
+  archetypeId,
 }: ArchetypeReactionCardProps) {
   const score = state.reaction?.support_or_oppose
     ? Math.round(state.reaction.support_or_oppose * 100)
@@ -32,18 +40,28 @@ export function ArchetypeReactionCard({
 
   const concerns = state.reaction?.concerns ?? []
   const rationale = state.reaction?.rationale ?? state.reactionText
+  const imagePath = ARCHETYPE_IMAGE[archetypeId]
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="flex size-9 items-center justify-center rounded-full text-white font-semibold text-sm"
-              style={{ backgroundColor: score !== null && score < 0 ? "var(--destructive)" : "var(--primary)" }}
-            >
-              {displayName[0]}
-            </div>
+            {imagePath ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={imagePath}
+                alt={displayName}
+                className="size-9 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="flex size-9 items-center justify-center rounded-full text-white font-semibold text-sm"
+                style={{ backgroundColor: score !== null && score < 0 ? "var(--destructive)" : "var(--primary)" }}
+              >
+                {displayName[0]}
+              </div>
+            )}
             <div>
               <div className="text-sm font-medium">{displayName}</div>
               <div className="text-xs text-muted-foreground">{description}</div>

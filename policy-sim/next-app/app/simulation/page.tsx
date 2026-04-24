@@ -12,6 +12,7 @@ import { StanceBarChart } from "@/components/simulation/stance-bar-chart"
 import { PolicyBrief } from "@/components/simulation/policy-brief"
 import { ValidationPanel } from "@/components/simulation/validation-panel"
 import { useRunStream } from "@/hooks/useRunStream"
+import { useCompletedRuns } from "@/hooks/useCompletedRuns"
 import { createRun } from "@/lib/api"
 import type {
   ArchetypeStreamState,
@@ -43,11 +44,15 @@ export default function SimulationPage() {
   const [runId, setRunId] = useState<string | null>(null)
   const [selectedScenario, setSelectedScenario] = useState("")
   const [runStatus, setRunStatus] = useState<"idle" | "running" | "done">("idle")
+  const [mode, setMode] = useState<"live" | "replay">("live")
+  const [replayRunId, setReplayRunId] = useState<string | null>(null)
   const [supervisorText, setSupervisorText] = useState("")
   const [briefMarkdown, setBriefMarkdown] = useState("")
   const [briefValidated, setBriefValidated] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [briefStreaming, setBriefStreaming] = useState(false)
+
+  const { runs: completedRuns } = useCompletedRuns()
 
   const [archetypes, setArchetypes] = useState<
     Record<string, ArchetypeStreamState>
@@ -154,9 +159,35 @@ export default function SimulationPage() {
     []
   )
 
-  useRunStream(runId, handlers)
+  // runId to stream: use replayRunId when in replay mode, otherwise the newly created runId
+  const activeRunId = mode === "replay" ? replayRunId : runId
+
+  useRunStream(activeRunId, handlers, mode)
 
   const handleRun = useCallback(async () => {
+    if (mode === "replay") {
+      if (!replayRunId) return
+      setRunId(replayRunId)
+      setRunStatus("running")
+      // Reset streams for replay
+      setSupervisorText("")
+      setBriefMarkdown("")
+      setBriefValidated(false)
+      setValidationResult(null)
+      setBriefStreaming(false)
+      const init: Record<string, ArchetypeStreamState> = {}
+      Object.keys(ARCHETYPE_META).forEach((id) => {
+        init[id] = {
+          thinkingText: "",
+          reactionText: "",
+          isStreaming: true,
+          reactionDone: false,
+          reaction: null,
+        }
+      })
+      setArchetypes(init)
+      return
+    }
     if (!selectedScenario) return
     try {
       const { run_id } = await createRun(selectedScenario)
@@ -164,7 +195,7 @@ export default function SimulationPage() {
     } catch (err) {
       console.error("Failed to create run:", err)
     }
-  }, [selectedScenario])
+  }, [mode, selectedScenario, replayRunId])
 
   // Archetype IDs in display order
   const archetypeIds = useMemo(() => Object.keys(archetypes), [archetypes])
@@ -229,6 +260,11 @@ export default function SimulationPage() {
               onRun={handleRun}
               isRunning={runStatus === "running"}
               disabled={!selectedScenario}
+              mode={mode}
+              onModeChange={setMode}
+              replayRunId={replayRunId ?? undefined}
+              onReplayRunIdChange={setReplayRunId}
+              completedRuns={completedRuns}
             />
           </div>
 

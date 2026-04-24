@@ -30,22 +30,41 @@ function formatScore(score: number): string {
   return `${sign}${Math.round(score)}`
 }
 
+const ARCHETYPE_IMAGE: Record<string, string> = {
+  citizen_low_income: "/sarah.png",
+  small_business: "/mark.png",
+  public_worker: "/priya.png",
+  pensioner: "/arthur.png",
+}
+
 export function ArchetypeKPICard({
   displayName,
   description,
   state,
+  archetypeId,
 }: ArchetypeKPICardProps) {
   const score = state.reaction?.support_or_oppose
     ? Math.round(state.reaction.support_or_oppose * 100)
     : null
 
+  const imagePath = ARCHETYPE_IMAGE[archetypeId]
+
   return (
     <Card>
       <CardContent className="flex flex-col gap-3 p-4">
         <div className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
-            {displayName[0]}
-          </div>
+          {imagePath ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={imagePath}
+              alt={displayName}
+              className="size-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+              {displayName[0]}
+            </div>
+          )}
           <div className="flex flex-col">
             <span className="text-sm font-medium">{displayName}</span>
             <span className="text-xs text-muted-foreground">{description}</span>
