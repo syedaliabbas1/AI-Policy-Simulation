@@ -100,6 +100,31 @@ async def create_run(body: dict):
     return {"run_id": state["run_id"]}
 
 
+@app.get("/api/runs")
+async def list_runs():
+    """Return metadata for all simulation runs (most recent first)."""
+    if not _RUNS_ROOT.exists():
+        return {"runs": []}
+    runs: list[dict] = []
+    for run_dir in sorted(_RUNS_ROOT.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
+        if not run_dir.is_dir():
+            continue
+        state_path = run_dir / "state.json"
+        if not state_path.exists():
+            continue
+        try:
+            state = read_json(state_path)
+            runs.append({
+                "run_id": run_dir.name,
+                "status": state.get("status", "unknown"),
+                "created_at": state.get("created_at", ""),
+                "scenario_path": state.get("scenario_path", ""),
+            })
+        except Exception:
+            continue
+    return {"runs": runs}
+
+
 @app.get("/api/runs/{run_id}/stream")
 async def stream_run(run_id: str):
     try:

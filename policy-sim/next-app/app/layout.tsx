@@ -27,7 +27,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <TooltipProvider delayDuration={300}>
+          <TooltipProvider delay={300}>
             {children}
           </TooltipProvider>
         </ThemeProvider>

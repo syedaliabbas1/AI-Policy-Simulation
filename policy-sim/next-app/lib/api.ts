@@ -47,6 +47,10 @@ export async function compareRuns(runIds: string[]): Promise<CompareResponse> {
   return get<CompareResponse>(`/api/runs/compare?runs=${runIds.join(",")}`)
 }
 
+export async function listRuns(): Promise<{ runs: Array<{ run_id: string; status: string; created_at: string; scenario_path: string }> }> {
+  return get<{ runs: Array<{ run_id: string; status: string; created_at: string; scenario_path: string }> }>("/api/runs")
+}
+
 export async function compareBriefs(runIds: string[]): Promise<CompareBriefsResponse> {
   return get<CompareBriefsResponse>(`/api/runs/compare/briefs?runs=${runIds.join(",")}`)
 }
