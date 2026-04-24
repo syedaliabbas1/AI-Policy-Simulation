@@ -14,7 +14,6 @@ import { IconPlayerPlay, IconLoader, IconRepeat } from "@tabler/icons-react"
 export interface CompletedRunItem {
   run_id: string
   scenario_path: string
-  has_full_data?: boolean
 }
 
 export interface SimulationHeaderProps {
@@ -46,7 +45,6 @@ export function SimulationHeader({
   const isDisabled = isRunning || loading
 
   const replayRuns = completedRuns
-    .filter((r) => r.has_full_data !== false)
     .map((r) => ({
       run_id: r.run_id,
       label: r.scenario_path

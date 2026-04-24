@@ -8,7 +8,6 @@ export interface CompletedRun {
   status: string
   created_at: string
   scenario_path: string
-  has_full_data?: boolean
 }
 
 function authUrl(path: string): string {
