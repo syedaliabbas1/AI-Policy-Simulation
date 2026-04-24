@@ -30,8 +30,8 @@ function StanceChart({ archetypes }: { archetypes: Props["archetypes"] }) {
   if (data.length === 0) return null
 
   return (
-    <Card className="mb-6 p-4">
-      <p className="text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wide mb-4">
+    <Card className="mb-8 p-5">
+      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">
         Distributional Stance
       </p>
       <BarList
@@ -54,21 +54,27 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
   const isStreaming = phase === "reporting"
 
   return (
-    <section className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#090E1A]">
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 rounded-full bg-blue-500" />
-          <div className="flex-1">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Policy Analysis Brief</h2>
-            <span className="text-xs text-gray-500 dark:text-gray-500">
-              {isStreaming ? "Generating…" : "Completed"}
-            </span>
+    <section className="border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
+
+        {/* Section header */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+              Policy Analysis Brief
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="h-px w-8 bg-blue-500" />
+              <span className="text-xs text-gray-400 dark:text-gray-600">
+                {isStreaming ? "Generating" : "Complete"}
+              </span>
+              {isStreaming && <span className="cursor-blink text-blue-500" />}
+            </div>
           </div>
-          {isStreaming && <span className="cursor-blink text-blue-500 ml-1">▋</span>}
           {briefAudioUrl && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Narration</span>
-              <audio controls src={briefAudioUrl} className="h-8" style={{ width: "200px", colorScheme: "light" }} />
+              <span className="text-xs text-gray-400">Narration</span>
+              <audio controls src={briefAudioUrl} className="h-8" style={{ width: "180px", colorScheme: "light" }} />
             </div>
           )}
         </div>
@@ -76,35 +82,38 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
         <StanceChart archetypes={archetypes} />
 
         {markdown && (
-          <div className="font-sans text-gray-900 dark:text-gray-50">
+          <div className="brief-body text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
             <ReactMarkdown
               components={{
                 h1: ({ children }) => (
-                  <h1 style={{ fontFamily: "var(--font-document)", fontSize: "1.5rem", fontWeight: 500, color: "#0f172a", marginBottom: "0.5rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.5rem", marginTop: "1.5rem" }}>
+                  <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mt-8 mb-3 pb-2 border-b border-gray-200 dark:border-gray-800">
                     {children}
                   </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 style={{ fontFamily: "var(--font-document)", fontSize: "1.15rem", fontWeight: 600, color: "#1e293b", marginTop: "1.5rem", marginBottom: "0.4rem" }}>
+                  <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-2">
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 style={{ fontFamily: "var(--font-ui)", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#b45309", marginTop: "1.2rem", marginBottom: "0.3rem" }}>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 mt-5 mb-2">
                     {children}
                   </h3>
                 ),
                 p: ({ children }) => (
-                  <p style={{ marginBottom: "0.85rem", color: "#334155" }}>{children}</p>
+                  <p className="mb-3 text-gray-600 dark:text-gray-400 leading-relaxed">{children}</p>
                 ),
                 li: ({ children }) => (
-                  <li style={{ marginBottom: "0.3rem", color: "#334155" }}>{children}</li>
+                  <li className="mb-1.5 text-gray-600 dark:text-gray-400">{children}</li>
+                ),
+                ul: ({ children }) => (
+                  <ul className="mb-4 ml-4 space-y-1 list-disc list-outside">{children}</ul>
                 ),
                 strong: ({ children }) => (
-                  <strong style={{ color: "#0f172a", fontWeight: 600 }}>{children}</strong>
+                  <strong className="font-semibold text-gray-800 dark:text-gray-200">{children}</strong>
                 ),
                 blockquote: ({ children }) => (
-                  <blockquote style={{ borderLeft: "3px solid #b45309", paddingLeft: "1rem", margin: "1rem 0", color: "#64748b", fontStyle: "italic" }}>
+                  <blockquote className="border-l-2 border-amber-500 pl-4 my-4 text-gray-500 dark:text-gray-500 italic">
                     {children}
                   </blockquote>
                 ),
@@ -112,7 +121,7 @@ export function BriefDisplay({ phase, markdown, archetypes, briefAudioUrl }: Pro
             >
               {markdown}
             </ReactMarkdown>
-            {isStreaming && <span className="cursor-blink text-blue-500">▋</span>}
+            {isStreaming && <span className="cursor-blink text-blue-500" />}
           </div>
         )}
       </div>
