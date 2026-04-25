@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server"
 import { proxyFetch } from "@/lib/proxy"
 
+export const maxDuration = 300
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
