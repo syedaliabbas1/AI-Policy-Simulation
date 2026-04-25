@@ -91,9 +91,8 @@ export function SimulationHeader({
 
       {mode === "live" ? (
         <Select
-          items={scenarios}
           value={selectedScenario}
-          onValueChange={onScenarioChange}
+          onValueChange={(v) => v && onScenarioChange(v)}
           disabled={isDisabled}
         >
           <SelectTrigger className="w-64">
@@ -109,9 +108,8 @@ export function SimulationHeader({
         </Select>
       ) : (
         <Select
-          items={replayRuns}
           value={replayRunId ?? ""}
-          onValueChange={(v) => onReplayRunIdChange?.(v)}
+          onValueChange={(v) => v && onReplayRunIdChange?.(v)}
           disabled={isRunning}
         >
           <SelectTrigger className="w-64">
