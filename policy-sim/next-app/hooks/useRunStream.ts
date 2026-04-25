@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useCallback, useState } from "react"
-import { API_BASE } from "@/lib/api"
 import type {
   RunStarted,
   SupervisorText,
+  SupervisorDone,
   Thinking,
   ReactionDelta,
   ReactionComplete,
@@ -12,12 +12,13 @@ import type {
   BriefDone,
   ValidationResult,
   ValidationWarning,
-  ArchetypeStreamState,
+  AudioReady,
 } from "@/lib/types"
 
 export interface RunStreamHandlers {
   onRunStarted?: (data: RunStarted) => void
   onSupervisorText?: (data: SupervisorText) => void
+  onSupervisorDone?: (data: SupervisorDone) => void
   onThinking?: (data: Thinking) => void
   onReactionDelta?: (data: ReactionDelta) => void
   onReactionComplete?: (data: ReactionComplete) => void
@@ -25,13 +26,9 @@ export interface RunStreamHandlers {
   onBriefDone?: (data: BriefDone) => void
   onValidation?: (data: ValidationResult) => void
   onValidationWarning?: (data: ValidationWarning) => void
+  onAudioReady?: (data: AudioReady) => void
   onDone?: () => void
   onError?: (error: Event) => void
-}
-
-function authUrl(path: string): string {
-  const key = process.env.NEXT_PUBLIC_POLICY_SIM_KEY ?? ""
-  return key ? `${API_BASE}${path}?key=${key}` : `${API_BASE}${path}`
 }
 
 export function useRunStream(
@@ -54,9 +51,13 @@ export function useRunStream(
     if (!runId) return
     disconnect()
 
-    const endpoint = mode === "replay" ? `/api/runs/${runId}/replay` : `/api/runs/${runId}/stream`
-    const url = authUrl(endpoint)
-    const es = new EventSource(url)
+    // Relative URL — routes through Next.js API route which attaches auth server-side
+    const endpoint =
+      mode === "replay"
+        ? `/api/runs/${runId}/replay`
+        : `/api/runs/${runId}/stream`
+
+    const es = new EventSource(endpoint)
     esRef.current = es
 
     es.onopen = () => setConnected(true)
@@ -69,6 +70,10 @@ export function useRunStream(
 
     es.addEventListener("supervisor_text", (e) => {
       handlersRef.current.onSupervisorText?.(JSON.parse(e.data))
+    })
+
+    es.addEventListener("supervisor_done", (e) => {
+      handlersRef.current.onSupervisorDone?.(JSON.parse(e.data))
     })
 
     es.addEventListener("thinking", (e) => {
@@ -97,6 +102,10 @@ export function useRunStream(
 
     es.addEventListener("validation_warning", (e) => {
       handlersRef.current.onValidationWarning?.(JSON.parse(e.data))
+    })
+
+    es.addEventListener("audio_ready", (e) => {
+      handlersRef.current.onAudioReady?.(JSON.parse(e.data))
     })
 
     es.addEventListener("done", () => {

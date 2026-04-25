@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo, useEffect } from "react"
+import { useState, useCallback, useMemo, useEffect, useRef } from "react"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
@@ -19,22 +19,23 @@ import type {
   ValidationResult,
   RunStarted,
   ArchetypeReaction,
+  Briefing,
 } from "@/lib/types"
 
 const ARCHETYPE_META: Record<string, { displayName: string; description: string }> = {
-  citizen_low_income: {
+  low_income_worker: {
     displayName: "Sarah",
     description: "Shop worker, London",
   },
-  small_business: {
+  small_business_owner: {
     displayName: "Mark",
     description: "Small business owner",
   },
-  public_worker: {
+  urban_professional: {
     displayName: "Priya",
     description: "NHS nurse, Manchester",
   },
-  pensioner: {
+  retired_pensioner: {
     displayName: "Arthur",
     description: "Pensioner, Bristol",
   },
@@ -51,6 +52,10 @@ export default function SimulationPage() {
   const [briefValidated, setBriefValidated] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [briefStreaming, setBriefStreaming] = useState(false)
+  const [briefings, setBriefings] = useState<Record<string, Briefing>>({})
+  const [briefAudioUrl, setBriefAudioUrl] = useState<string | null>(null)
+  const [archetypeAudioUrls, setArchetypeAudioUrls] = useState<Record<string, string>>({})
+  const currentRunIdRef = useRef<string | null>(null)
 
   const { runs: completedRuns } = useCompletedRuns()
 
@@ -61,6 +66,7 @@ export default function SimulationPage() {
   const handlers = useMemo(
     () => ({
       onRunStarted: ({ run_id, archetype_ids }: RunStarted) => {
+        currentRunIdRef.current = run_id
         setRunId(run_id)
         setRunStatus("running")
         const init: Record<string, ArchetypeStreamState> = {}
@@ -79,10 +85,17 @@ export default function SimulationPage() {
         setBriefValidated(false)
         setValidationResult(null)
         setBriefStreaming(false)
+        setBriefings({})
+        setBriefAudioUrl(null)
+        setArchetypeAudioUrls({})
       },
 
       onSupervisorText: ({ token }: { token: string }) => {
         setSupervisorText((prev) => prev + token)
+      },
+
+      onSupervisorDone: ({ briefings: b }: { briefings: Record<string, Briefing> }) => {
+        setBriefings(b)
       },
 
       onThinking: ({ archetype_id, token }: { archetype_id: string; token: string }) => {
@@ -147,6 +160,17 @@ export default function SimulationPage() {
         setRunStatus("done")
       },
 
+      onAudioReady: ({ archetype_id, filename }: { archetype_id: string; filename: string }) => {
+        const id = currentRunIdRef.current
+        if (!id) return
+        const url = `/api/runs/${id}/audio/${filename}`
+        if (archetype_id === "brief") {
+          setBriefAudioUrl(url)
+        } else {
+          setArchetypeAudioUrls((prev) => ({ ...prev, [archetype_id]: url }))
+        }
+      },
+
       onValidation: (data: ValidationResult) => {
         setValidationResult(data)
         setBriefValidated(true)
@@ -167,6 +191,7 @@ export default function SimulationPage() {
   const handleRun = useCallback(async () => {
     if (mode === "replay") {
       if (!replayRunId) return
+      currentRunIdRef.current = replayRunId
       setRunId(replayRunId)
       setRunStatus("running")
       // Reset streams for replay
@@ -175,6 +200,9 @@ export default function SimulationPage() {
       setBriefValidated(false)
       setValidationResult(null)
       setBriefStreaming(false)
+      setBriefings({})
+      setBriefAudioUrl(null)
+      setArchetypeAudioUrls({})
       const init: Record<string, ArchetypeStreamState> = {}
       Object.keys(ARCHETYPE_META).forEach((id) => {
         init[id] = {
@@ -303,6 +331,8 @@ export default function SimulationPage() {
                     displayName={meta.displayName}
                     description={meta.description}
                     state={archetypes[id]}
+                    briefing={briefings[id]}
+                    audioUrl={archetypeAudioUrls[id]}
                   />
                 )
               })}
@@ -314,6 +344,7 @@ export default function SimulationPage() {
             markdown={briefMarkdown}
             isStreaming={briefStreaming}
             validated={briefValidated}
+            audioUrl={briefAudioUrl ?? undefined}
           />
 
           {/* IFS Validation */}

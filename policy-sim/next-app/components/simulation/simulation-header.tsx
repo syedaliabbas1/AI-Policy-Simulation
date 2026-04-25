@@ -14,6 +14,7 @@ import { IconPlayerPlay, IconLoader, IconRepeat } from "@tabler/icons-react"
 export interface CompletedRunItem {
   run_id: string
   scenario_path: string
+  created_at?: string
 }
 
 export interface SimulationHeaderProps {
@@ -58,7 +59,7 @@ export function SimulationHeader({
         : r.run_id,
       created_at: r.created_at,
     }))
-    .sort((a, b) => (a.created_at > b.created_at ? -1 : 1))
+    .sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1))
 
   return (
     <div className="flex items-center gap-3 px-4 lg:px-6">

@@ -4,13 +4,15 @@ import Image from "next/image"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning"
-import type { ArchetypeStreamState } from "@/lib/types"
+import type { ArchetypeStreamState, Briefing } from "@/lib/types"
 
 interface ArchetypeReactionCardProps {
   archetypeId: string
   displayName: string
   description: string
   state: ArchetypeStreamState
+  briefing?: Briefing
+  audioUrl?: string
 }
 
 function scoreColor(score: number): "default" | "destructive" {
@@ -23,10 +25,10 @@ function formatScore(score: number): string {
 }
 
 const ARCHETYPE_IMAGE: Record<string, string> = {
-  citizen_low_income: "/sarah.png",
-  small_business: "/mark.png",
-  public_worker: "/priya.png",
-  pensioner: "/arthur.png",
+  low_income_worker: "/sarah.png",
+  small_business_owner: "/mark.png",
+  urban_professional: "/priya.png",
+  retired_pensioner: "/arthur.png",
 }
 
 export function ArchetypeReactionCard({
@@ -34,6 +36,8 @@ export function ArchetypeReactionCard({
   description,
   state,
   archetypeId,
+  briefing,
+  audioUrl,
 }: ArchetypeReactionCardProps) {
   const score = state.reaction?.support_or_oppose
     ? Math.round(state.reaction.support_or_oppose * 100)
@@ -75,6 +79,12 @@ export function ArchetypeReactionCard({
         </div>
       </CardHeader>
 
+      {briefing && (
+        <div className="px-6 pb-0 pt-0 border-b border-border">
+          <p className="text-xs text-muted-foreground leading-relaxed py-2">{briefing.headline}</p>
+        </div>
+      )}
+
       <CardContent className="flex flex-col gap-3">
         <Reasoning isStreaming={state.isStreaming && !state.reactionDone}>
           <ReasoningTrigger />
@@ -102,6 +112,13 @@ export function ArchetypeReactionCard({
           <p className="text-sm text-muted-foreground leading-relaxed animate-pulse">
             {state.reactionText}
           </p>
+        )}
+
+        {audioUrl && (
+          <div className="pt-1 border-t border-border">
+            <span className="block mb-1 text-xs font-medium text-muted-foreground">Voice</span>
+            <audio controls src={audioUrl} className="w-full h-8" />
+          </div>
         )}
       </CardContent>
     </Card>

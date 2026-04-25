@@ -10,9 +10,10 @@ interface PolicyBriefProps {
   markdown: string
   isStreaming?: boolean
   validated?: boolean
+  audioUrl?: string
 }
 
-export function PolicyBrief({ markdown, isStreaming = false, validated = false }: PolicyBriefProps) {
+export function PolicyBrief({ markdown, isStreaming = false, validated = false, audioUrl }: PolicyBriefProps) {
   const [plugins, setPlugins] = useState<PluggableList | null>(null)
 
   useEffect(() => {
@@ -46,6 +47,9 @@ export function PolicyBrief({ markdown, isStreaming = false, validated = false }
               <span className="size-1.5 animate-pulse rounded-full bg-current" />
               Streaming
             </Badge>
+          )}
+          {audioUrl && (
+            <audio controls src={audioUrl} className="h-8 ml-auto" style={{ width: "180px" }} />
           )}
         </div>
       </CardHeader>

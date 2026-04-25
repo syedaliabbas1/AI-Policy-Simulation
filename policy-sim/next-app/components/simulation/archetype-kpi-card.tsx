@@ -31,10 +31,10 @@ function formatScore(score: number): string {
 }
 
 const ARCHETYPE_IMAGE: Record<string, string> = {
-  citizen_low_income: "/sarah.png",
-  small_business: "/mark.png",
-  public_worker: "/priya.png",
-  pensioner: "/arthur.png",
+  low_income_worker: "/sarah.png",
+  small_business_owner: "/mark.png",
+  urban_professional: "/priya.png",
+  retired_pensioner: "/arthur.png",
 }
 
 export function ArchetypeKPICard({

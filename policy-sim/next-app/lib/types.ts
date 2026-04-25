@@ -1,5 +1,21 @@
 // ─── SSE Event Payloads ───────────────────────────────────────────────────────
 
+export interface Briefing {
+  archetype_id: string
+  headline: string
+  key_points: string[]
+  personal_relevance: string
+}
+
+export interface SupervisorDone {
+  briefings: Record<string, Briefing>
+}
+
+export interface AudioReady {
+  archetype_id: string
+  filename: string
+}
+
 export interface RunStarted {
   run_id: string
   scenario_path: string
