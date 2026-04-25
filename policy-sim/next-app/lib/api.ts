@@ -5,22 +5,14 @@ import type {
   ValidationResult,
 } from "./types"
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
-
-function authUrl(path: string): string {
-  const key = process.env.NEXT_PUBLIC_POLICY_SIM_KEY ?? ""
-  return key ? `${API_BASE}${path}?key=${key}` : `${API_BASE}${path}`
-}
-
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(authUrl(path))
+  const res = await fetch(path)
   if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`)
   return res.json() as Promise<T>
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(authUrl(path), {
+  const res = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -56,7 +48,5 @@ export async function compareBriefs(runIds: string[]): Promise<CompareBriefsResp
 }
 
 export function getReplayUrl(runId: string, delayMs = 30): string {
-  return authUrl(`/api/runs/${runId}/replay?delay_ms=${delayMs}`)
+  return `/api/runs/${runId}/replay?delay_ms=${delayMs}`
 }
-
-export { API_BASE }

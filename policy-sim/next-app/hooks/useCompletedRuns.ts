@@ -1,18 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { API_BASE } from "@/lib/api"
 
 export interface CompletedRun {
   run_id: string
   status: string
   created_at: string
   scenario_path: string
-}
-
-function authUrl(path: string): string {
-  const key = process.env.NEXT_PUBLIC_POLICY_SIM_KEY ?? ""
-  return key ? `${API_BASE}${path}?key=${key}` : `${API_BASE}${path}`
 }
 
 export function useCompletedRuns() {
@@ -24,7 +18,7 @@ export function useCompletedRuns() {
     let cancelled = false
     async function load() {
       try {
-        const res = await fetch(authUrl("/api/runs"))
+        const res = await fetch("/api/runs")
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         if (!cancelled) {
