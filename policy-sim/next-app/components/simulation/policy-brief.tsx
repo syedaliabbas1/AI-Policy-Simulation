@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Conversation, ConversationContent } from "@/components/ai-elements/conversation"
-import { Streamdown, type PluggableList } from "streamdown"
+import { Streamdown } from "streamdown"
+type PluggableList = any[]
 
 interface PolicyBriefProps {
   markdown: string
@@ -27,7 +28,8 @@ export function PolicyBrief({ markdown, isStreaming = false, validated = false, 
       if (cjk.createCjkPlugin) list.push(cjk.createCjkPlugin())
       if (code.createCodePlugin) list.push(code.createCodePlugin())
       if (math.createMathPlugin) list.push(math.createMathPlugin())
-      if (mermaid.createMermaidPlugin) list.push(mermaid.createMermaidPlugin(mermaid.mermaid))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (mermaid.createMermaidPlugin) list.push(mermaid.createMermaidPlugin(mermaid.mermaid as any))
       setPlugins(list)
     })
   }, [])
@@ -59,7 +61,7 @@ export function PolicyBrief({ markdown, isStreaming = false, validated = false, 
             {markdown ? (
               <div className="text-sm leading-relaxed text-muted-foreground prose prose-sm dark:prose-invert max-w-none">
                 {plugins ? (
-                  <Streamdown plugins={plugins}>{markdown}</Streamdown>
+                  <Streamdown plugins={plugins as any}>{markdown}</Streamdown>
                 ) : (
                   <div className="animate-pulse space-y-2">
                     <div className="h-4 w-full rounded bg-muted" />

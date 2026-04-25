@@ -20,15 +20,18 @@ function CustomTooltip({
   payload,
 }: {
   active?: boolean
-  payload?: Array<{ value: number; payload: { name: string; runLabel: string } }>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: Array<{ value: number; name: string; payload: Record<string, any> }>
 }) {
   if (!active || !payload?.length) return null
-  const { value, runLabel } = payload[0].payload
+  const value = payload[0].value
+  const archName = payload[0].payload.name as string
+  const runLabel = payload[0].name
   return (
     <div className="rounded-xl bg-popover px-3 py-2 text-sm shadow-lg ring-1 ring-foreground/10">
       <span className="font-medium">{runLabel}</span>
       <br />
-      <span className="text-muted-foreground">{payload[0].payload.name}: </span>
+      <span className="text-muted-foreground">{archName}: </span>
       <span className={value >= 0 ? "text-[var(--chart-1)]" : "text-destructive"}>
         {formatScore(value)}
       </span>
