@@ -1,0 +1,126 @@
+"use client"
+
+import Image from "next/image"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning"
+import type { ArchetypeStreamState, Briefing } from "@/lib/types"
+
+interface ArchetypeReactionCardProps {
+  archetypeId: string
+  displayName: string
+  description: string
+  state: ArchetypeStreamState
+  briefing?: Briefing
+  audioUrl?: string
+}
+
+function scoreColor(score: number): "default" | "destructive" {
+  return score >= 0 ? "default" : "destructive"
+}
+
+function formatScore(score: number): string {
+  const sign = score > 0 ? "+" : ""
+  return `${sign}${Math.round(score)}`
+}
+
+const ARCHETYPE_IMAGE: Record<string, string> = {
+  low_income_worker: "/sarah.png",
+  small_business_owner: "/mark.png",
+  urban_professional: "/priya.png",
+  retired_pensioner: "/arthur.png",
+}
+
+export function ArchetypeReactionCard({
+  displayName,
+  description,
+  state,
+  archetypeId,
+  briefing,
+  audioUrl,
+}: ArchetypeReactionCardProps) {
+  const score = state.reaction?.support_or_oppose
+    ? Math.round(state.reaction.support_or_oppose * 100)
+    : null
+
+  const concerns = state.reaction?.concerns ?? []
+  const rationale = state.reaction?.rationale ?? state.reactionText
+  const imagePath = ARCHETYPE_IMAGE[archetypeId]
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {imagePath ? (
+              <Image
+                src={imagePath}
+                alt={displayName}
+                width={36}
+                height={36}
+                className="size-9 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className="flex size-9 items-center justify-center rounded-full text-white font-semibold text-sm"
+                style={{ backgroundColor: score !== null && score < 0 ? "var(--destructive)" : "var(--primary)" }}
+              >
+                {displayName[0]}
+              </div>
+            )}
+            <div>
+              <div className="text-sm font-medium">{displayName}</div>
+              <div className="text-xs text-muted-foreground">{description}</div>
+            </div>
+          </div>
+          {score !== null && (
+            <Badge variant={scoreColor(score)}>{formatScore(score)}</Badge>
+          )}
+        </div>
+      </CardHeader>
+
+      {briefing && (
+        <div className="px-6 pb-0 pt-0 border-b border-border">
+          <p className="text-xs text-muted-foreground leading-relaxed py-2">{briefing.headline}</p>
+        </div>
+      )}
+
+      <CardContent className="flex flex-col gap-3">
+        <Reasoning isStreaming={state.isStreaming && !state.reactionDone}>
+          <ReasoningTrigger />
+          <ReasoningContent>{state.thinkingText}</ReasoningContent>
+        </Reasoning>
+
+        {state.reactionDone && rationale && (
+          <div className="flex flex-col gap-2">
+            {concerns.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {concerns.map((c, i) => (
+                  <Badge key={i} variant="outline" className="text-xs">
+                    {c}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {rationale}
+            </p>
+          </div>
+        )}
+
+        {!state.reactionDone && state.reactionText && (
+          <p className="text-sm text-muted-foreground leading-relaxed animate-pulse">
+            {state.reactionText}
+          </p>
+        )}
+
+        {audioUrl && (
+          <div className="pt-1 border-t border-border">
+            <span className="block mb-1 text-xs font-medium text-muted-foreground">Voice</span>
+            <audio controls src={audioUrl} className="w-full h-8" />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

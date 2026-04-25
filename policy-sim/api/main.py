@@ -13,7 +13,6 @@ from sse_starlette.sse import EventSourceResponse
 
 from simulation.engine import SimulationEngine
 from simulation.utils import RunPaths, read_json, read_last_complete_event
-
 from .auth import ApiKeyMiddleware
 from .scenarios import list_scenarios, list_policies, get_policy
 from .stream import live_stream, replay_stream
@@ -40,7 +39,7 @@ app = FastAPI(title="policy-sim API", docs_url=None, redoc_url=None)
 app.add_middleware(ApiKeyMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(","),
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
@@ -98,6 +97,31 @@ async def create_run(body: dict):
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
     return {"run_id": state["run_id"]}
+
+
+@app.get("/api/runs")
+async def list_runs():
+    """Return metadata for all simulation runs (most recent first)."""
+    if not _RUNS_ROOT.exists():
+        return {"runs": []}
+    runs: list[dict] = []
+    for run_dir in sorted(_RUNS_ROOT.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
+        if not run_dir.is_dir():
+            continue
+        state_path = run_dir / "state.json"
+        if not state_path.exists():
+            continue
+        try:
+            state = read_json(state_path)
+            runs.append({
+                "run_id": run_dir.name,
+                "status": state.get("status", "unknown"),
+                "created_at": state.get("created_at", ""),
+                "scenario_path": state.get("scenario_path", ""),
+            })
+        except Exception:
+            continue
+    return {"runs": runs}
 
 
 @app.get("/api/runs/{run_id}/stream")
