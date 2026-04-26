@@ -1,6 +1,7 @@
 """SimulationEngine — orchestrates the supervisor → archetypes → reporter pipeline."""
 
 import asyncio
+import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Awaitable, Callable
@@ -21,7 +22,6 @@ from .streaming import (
 from .utils import (
     RunPaths,
     append_jsonl,
-    generate_run_id,
     read_json,
     read_jsonl,
     read_last_complete_event,
@@ -110,7 +110,12 @@ class SimulationEngine:
         if not scenario_path.exists():
             raise FileNotFoundError(f"Scenario not found: {scenario_path}")
 
-        run_id = generate_run_id()
+        # Canonical run ID = scenario stem — new runs overwrite old ones for same policy
+        run_id = scenario_path.stem
+        run_dir = self.runs_root / run_id
+        if run_dir.exists():
+            shutil.rmtree(run_dir)
+
         state: dict[str, Any] = {
             "run_id": run_id,
             "created_at": utc_now_iso(),
