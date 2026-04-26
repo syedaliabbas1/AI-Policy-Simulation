@@ -1,4 +1,4 @@
-# UK Fiscal Policy Simulation Platform
+# Poligent: Policy Simulation Platform
 
 A multi-agent AI system that generates structured stakeholder reasoning for proposed fiscal policies in minutes — validated against published distributional evidence.
 
