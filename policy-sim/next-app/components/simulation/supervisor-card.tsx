@@ -3,14 +3,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Conversation, ConversationContent } from "@/components/ai-elements/conversation"
-import { Streamdown } from "streamdown"
-import { cjk } from "@streamdown/cjk"
-import { code } from "@streamdown/code"
-import { math } from "@streamdown/math"
-import { mermaid } from "@streamdown/mermaid"
-import { IconPlayerPause } from "@tabler/icons-react"
-
-const streamdownPlugins = { cjk, code, math, mermaid }
 
 interface SupervisorCardProps {
   text: string
@@ -34,10 +26,14 @@ export function SupervisorCard({ text, isStreaming = false }: SupervisorCardProp
       <CardContent>
         <Conversation className="max-h-64 overflow-y-auto">
           <ConversationContent>
-            {text ? (
-              <div className="text-sm leading-relaxed text-muted-foreground">
-                <Streamdown plugins={streamdownPlugins}>{text}</Streamdown>
-              </div>
+            {isStreaming ? (
+              <p className="text-sm text-muted-foreground italic">
+                Generating personalised briefings for each archetype...
+              </p>
+            ) : text ? (
+              <p className="text-sm text-muted-foreground italic">
+                Briefings complete — see archetype cards below.
+              </p>
             ) : (
               <p className="text-sm text-muted-foreground italic">
                 Briefing will appear here...

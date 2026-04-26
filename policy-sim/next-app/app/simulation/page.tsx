@@ -286,7 +286,7 @@ export default function SimulationPage() {
           {/* Supervisor briefing */}
           <SupervisorCard
             text={supervisorText}
-            isStreaming={runStatus === "running" && !supervisorText.includes("\n\n")}
+            isStreaming={runStatus === "running" && Object.keys(briefings).length === 0}
           />
 
           {/* KPI Row: 4 archetype cards — always visible */}

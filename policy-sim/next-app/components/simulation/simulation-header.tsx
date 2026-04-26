@@ -96,7 +96,11 @@ export function SimulationHeader({
           disabled={isDisabled}
         >
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select a scenario..." />
+            <SelectValue placeholder="Select a scenario...">
+              {selectedScenario
+                ? (scenarios.find((s) => s.path === selectedScenario)?.label ?? selectedScenario)
+                : null}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {scenarios.map((s) => (
