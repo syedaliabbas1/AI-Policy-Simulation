@@ -62,8 +62,7 @@ export function ValidationPanel({ result }: ValidationPanelProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <Accordion {...{ type: "single", collapsible: true } as any} className="w-full">
+        <Accordion className="w-full">
           {(Object.keys(checks) as Array<keyof ValidationResult["checks"]>).map(
             (key) => {
               const check = checks[key]
