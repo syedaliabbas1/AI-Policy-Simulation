@@ -48,18 +48,21 @@ export function SimulationHeader({
   const replayRuns = completedRuns
     .map((r) => ({
       run_id: r.run_id,
-      label: r.scenario_path
-        ? r.scenario_path
-            .replace(/\\/g, "/")
-            .split("/")
-            .pop()
-            ?.replace(/\.(md|json)$/, "")
-            .replace(/[_-]/g, " ")
-            .replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? r.run_id
-        : r.run_id,
+      label:
+        scenarios.find((s) => s.path === r.scenario_path)?.label ??
+        (r.scenario_path
+          ? r.scenario_path
+              .replace(/\\/g, "/")
+              .split("/")
+              .pop()
+              ?.replace(/\.(md|json)$/, "")
+              .replace(/[_-]/g, " ")
+              .replace(/\b\w/g, (c: string) => c.toUpperCase()) ?? r.run_id
+          : r.run_id),
       created_at: r.created_at,
     }))
     .sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1))
+    .filter((r, i, arr) => arr.findIndex((x) => x.label === r.label) === i)
 
   return (
     <div className="flex items-center gap-3 px-4 lg:px-6">
@@ -117,7 +120,11 @@ export function SimulationHeader({
           disabled={isRunning}
         >
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select a run to replay..." />
+            <SelectValue placeholder="Select a run to replay...">
+              {replayRunId
+                ? (replayRuns.find((r) => r.run_id === replayRunId)?.label ?? replayRunId)
+                : null}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {replayRuns.length === 0 && (
