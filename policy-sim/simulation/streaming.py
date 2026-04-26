@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Awaitable, Callable
 
 import anthropic
-from anthropic.types.beta import BetaOutputConfigParam, BetaJSONOutputFormatParam
+from anthropic.types.beta import BetaOutputConfigParam
 
 from .caching import make_cache_block
 
@@ -138,12 +138,7 @@ async def stream_archetype(
         model=MODEL,
         max_tokens=16000,
         thinking=thinking_config,
-        output_config=BetaOutputConfigParam(
-            format=BetaJSONOutputFormatParam(
-                type="json_schema",
-                schema=REACTION_TOOL["input_schema"],
-            ),
-        ),
+        output_config=BetaOutputConfigParam(effort="high"),
         tools=[REACTION_TOOL],
         tool_choice={"type": "auto"},
         system=[make_cache_block(skill_body)],
@@ -220,11 +215,7 @@ async def stream_reporter(
         model=MODEL,
         max_tokens=4096,
         thinking=thinking_config,
-        output_config=BetaOutputConfigParam(
-            format=BetaJSONOutputFormatParam(
-                type="text",
-            ),
-        ),
+        output_config=BetaOutputConfigParam(effort="high"),
         system=[make_cache_block(skill_body, ttl="1h")],
         messages=[
             {
