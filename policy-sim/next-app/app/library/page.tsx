@@ -27,7 +27,8 @@ export default function LibraryPage() {
 
   useEffect(() => {
     listDocuments()
-      .then((d) => setDocs(d.documents))
+      .then((d) => setDocs(d.documents ?? []))
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 

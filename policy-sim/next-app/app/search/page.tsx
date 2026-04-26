@@ -22,7 +22,7 @@ export default function SearchPage() {
   const [query, setQuery] = useState("")
 
   useEffect(() => {
-    listDocuments().then((d) => setDocs(d.documents)).catch(() => {})
+    listDocuments().then((d) => setDocs(d.documents ?? [])).catch(() => {})
   }, [])
 
   function scenarioLabel(path: string) {
