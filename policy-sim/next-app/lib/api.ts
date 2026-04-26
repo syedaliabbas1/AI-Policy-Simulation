@@ -50,3 +50,22 @@ export async function compareBriefs(runIds: string[]): Promise<CompareBriefsResp
 export function getReplayUrl(runId: string, delayMs = 30): string {
   return `/api/runs/${runId}/replay?delay_ms=${delayMs}`
 }
+
+export async function listDocuments(): Promise<{ documents: Array<{ id: string; title: string; filename: string; size: number }> }> {
+  return get("/api/documents")
+}
+
+export async function getDocument(id: string): Promise<{ id: string; title: string; content: string }> {
+  return get(`/api/documents/${encodeURIComponent(id)}`)
+}
+
+export async function sendAssistantMessage(
+  messages: Array<{ role: string; content: string }>,
+  runId?: string
+): Promise<{ content: string }> {
+  return post("/api/assistant", { messages, run_id: runId ?? null })
+}
+
+export async function checkHealth(): Promise<{ status: string }> {
+  return get("/api/health")
+}

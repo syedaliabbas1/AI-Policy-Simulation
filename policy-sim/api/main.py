@@ -205,6 +205,71 @@ async def compare_runs(runs: str):
     return {"runs": runs_data}
 
 
+_KNOWLEDGE_DIR = Path(__file__).parent.parent / "knowledge_base" / "fiscal"
+
+
+@app.get("/api/documents")
+async def list_documents():
+    if not _KNOWLEDGE_DIR.exists():
+        return {"documents": []}
+    docs = [
+        {
+            "id": p.stem,
+            "title": p.stem.replace("_", " ").title(),
+            "filename": p.name,
+            "size": p.stat().st_size,
+        }
+        for p in sorted(_KNOWLEDGE_DIR.glob("*.md"))
+    ]
+    return {"documents": docs}
+
+
+@app.get("/api/documents/{doc_id}")
+async def get_document(doc_id: str):
+    import re
+    if not re.match(r"^[\w-]+$", doc_id):
+        raise HTTPException(status_code=400, detail="Invalid document ID")
+    path = _KNOWLEDGE_DIR / f"{doc_id}.md"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"Document {doc_id} not found")
+    return {
+        "id": doc_id,
+        "title": path.stem.replace("_", " ").title(),
+        "content": path.read_text(encoding="utf-8"),
+    }
+
+
+@app.post("/api/assistant")
+async def assistant_chat(body: dict):
+    import anthropic
+    messages = body.get("messages", [])
+    run_id = body.get("run_id")
+
+    system = (
+        "You are a UK fiscal policy analyst assistant for the Policy Simulation platform. "
+        "Help users understand simulation results, archetype reactions, and policy implications. "
+        "Be concise and analytical."
+    )
+    if run_id:
+        paths = RunPaths(run_dir=_RUNS_ROOT / run_id)
+        if paths.brief.exists():
+            brief = paths.brief.read_text(encoding="utf-8")
+            system += f"\n\nPolicy Brief from simulation run '{run_id}':\n\n{brief}"
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=1024,
+        system=system,
+        messages=[
+            {"role": m["role"], "content": m["content"]}
+            for m in messages
+            if m.get("role") in ("user", "assistant")
+        ],
+    )
+    return {"content": response.content[0].text}
+
+
 @app.get("/api/runs/compare/briefs")
 async def compare_briefs(runs: str):
     """Side-by-side brief markdown for multiple completed runs."""

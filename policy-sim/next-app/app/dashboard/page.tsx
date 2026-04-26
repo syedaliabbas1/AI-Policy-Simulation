@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { listRuns } from "@/lib/api"
+import { useScenarios } from "@/hooks/useScenarios"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -17,17 +18,6 @@ interface RunSummary {
   status: string
   created_at: string
   scenario_path: string
-}
-
-function scenarioLabel(path: string): string {
-  if (!path) return "—"
-  try {
-    const parts = path.replace(/\\/g, "/").split("/")
-    const filename = parts[parts.length - 1]
-    return filename.replace(/\.(md|json)$/, "").replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  } catch {
-    return path.split("/").pop() ?? "—"
-  }
 }
 
 function formatDate(iso: string): string {
@@ -62,6 +52,14 @@ export default function DashboardPage() {
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { scenarios } = useScenarios()
+
+  function scenarioLabel(path: string): string {
+    if (!path) return "—"
+    return scenarios.find((s) => s.path === path)?.label
+      ?? path.replace(/\\/g, "/").split("/").pop()?.replace(/\.(md|json)$/, "").replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      ?? "—"
+  }
 
   useEffect(() => {
     listRuns()

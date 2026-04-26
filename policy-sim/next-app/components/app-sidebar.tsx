@@ -25,14 +25,14 @@ import {
   IconSearch,
   IconDatabase,
   IconReport,
-  IconFileWord,
+  IconMessageChatbot,
   IconInnerShadowTop,
 } from "@tabler/icons-react"
 
 const data = {
   user: {
     name: "Policy Sim",
-    email: "admin@example.com",
+    email: "poligent.systems",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
@@ -61,35 +61,35 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: <IconSettings />,
     },
     {
       title: "Get Help",
-      url: "#",
+      url: "/help",
       icon: <IconHelp />,
     },
     {
       title: "Search",
-      url: "#",
+      url: "/search",
       icon: <IconSearch />,
     },
   ],
   documents: [
     {
       name: "Data Library",
-      url: "#",
+      url: "/library",
       icon: <IconDatabase />,
     },
     {
       name: "Reports",
-      url: "#",
+      url: "/reports",
       icon: <IconReport />,
     },
     {
-      name: "Word Assistant",
-      url: "#",
-      icon: <IconFileWord />,
+      name: "Policy Assistant",
+      url: "/assistant",
+      icon: <IconMessageChatbot />,
     },
   ],
 }
@@ -102,10 +102,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
+              render={<a href="/simulation" />}
             >
               <IconInnerShadowTop className="size-5!" />
-              <span className="text-base font-semibold">Acme Policy</span>
+              <span className="text-base font-semibold">Poligent</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
