@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
@@ -11,8 +12,13 @@ import { compareRuns, compareBriefs } from "@/lib/api"
 import type { CompareResponse, CompareBriefsResponse } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function ComparePage() {
-  const [selectedRuns, setSelectedRuns] = useState<string[]>([])
+function ComparePageInner() {
+  const searchParams = useSearchParams()
+  const runsParam = searchParams.get("runs")
+
+  const [selectedRuns, setSelectedRuns] = useState<string[]>(
+    runsParam ? runsParam.split(",").filter(Boolean) : []
+  )
   const [compareData, setCompareData] = useState<CompareResponse | null>(null)
   const [briefsData, setBriefsData] = useState<CompareBriefsResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -26,7 +32,6 @@ export default function ComparePage() {
     }
     setLoading(true)
     setError(null)
-    const runs = selectedRuns.join(",")
     Promise.all([compareRuns(selectedRuns), compareBriefs(selectedRuns)])
       .then(([compare, briefs]) => {
         setCompareData(compare)
@@ -80,5 +85,13 @@ export default function ComparePage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense>
+      <ComparePageInner />
+    </Suspense>
   )
 }
